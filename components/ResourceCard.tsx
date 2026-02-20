@@ -24,6 +24,10 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
           alt={resource.title}
           width={300}
           height={200}
+          style={{
+            width: "auto",
+            height: "auto",
+          }}
           className="hover:scale-110 transition-transform duration-300 rounded-lg cursor-pointer"
           onClick={() => setIsModalOpen(true)}
         />
