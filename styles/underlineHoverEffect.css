@@ -1,0 +1,79 @@
+@import url("https://fonts.googleapis.com/css?family=Varela+Round");
+
+:root {
+  --color-primary: #16023b;
+  --color-button: rgb(212, 175, 55);
+  --color-text-primary: #f8f4e6;
+  --color-text-secondary: #a9a9a9;
+  --colortest: rgb(15, 23, 42);
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.linksMenu li {
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: all 0.5s ease;
+  margin-right: 1rem;
+
+  a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    position: relative;
+    z-index: 2;
+    transition: all 0.5s ease;
+    font-style: italic;
+    font-size: larger;
+    padding: 1rem;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -40%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      0deg,
+      transparent,
+      transparent 30%,
+      rgb(212, 175, 55) 20%,
+      rgb(212, 175, 55) 40%,
+      transparent 70%
+    );
+    transform: rotate(-50deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px var(--color-button);
+  }
+
+  &:hover::before {
+    opacity: 1;
+    transform: rotate(-45deg) translateY(100%);
+  }
+
+  &:hover a {
+    color: var(--color-text-primary);
+    text-shadow: 0 0 10px rgb(10, 1, 25);
+  }
+
+  &:not(:last-child) {
+    margin-right: 30px;
+  }
+}
