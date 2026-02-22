@@ -1,0 +1,54 @@
+.linksMenu li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ahora todos los efectos, bordes y overflow se aplican directamente al enlace <a> */
+.linksMenu li a {
+  position: relative;
+  color: var(--color-text-primary);
+  z-index: 2;
+  transition: all 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* El ::before ahora nace desde el <a>, adaptándose a su tamaño exacto */
+.linksMenu li a::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    0deg,
+    transparent,
+    transparent 30%,
+    rgb(241, 185, 0) 20%,
+    rgb(241, 185, 0) 40%,
+    transparent 70%
+  );
+  transform: rotate(-50deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+  z-index: -1; /* Lo mandamos detrás del texto */
+}
+
+/* El hover escala el enlace completo */
+.linksMenu li a:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgb(241, 185, 0);
+  color: var(--color-text-primary);
+}
+
+/* Animación de la barra dorada */
+.linksMenu li a:hover::before {
+  opacity: 1;
+  transform: rotate(-45deg) translateY(100%);
+}

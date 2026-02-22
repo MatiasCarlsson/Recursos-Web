@@ -1,0 +1,35 @@
+.menu-toggle-btn {
+  position: relative;
+  /* Eliminamos display: grid y place-items: center de aquí */
+  width: 3.5rem;
+  height: 3.25rem;
+  padding-block: 0.5rem;
+  background: transparent;
+  z-index: 51;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-toggle-btn .bar {
+  width: 1.8rem;
+  height: 0.2rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Animación cuando el estado isOpen es true (clase .open) */
+.menu-toggle-btn.open .bar1 {
+  transform: translate(0, 0.75rem) rotate(270deg) scaleX(0.35) scaleY(1.75);
+  transform-origin: bottom right;
+}
+
+.menu-toggle-btn.open .bar2 {
+  transform: translate(0, 0) rotate(-270deg) scaleX(0.35) scaleY(1.75);
+  transform-origin: 50% 50%;
+}
+
+.menu-toggle-btn.open .bar3 {
+  transform: translate(0, -0.75rem) rotate(270deg) scaleX(0.35) scaleY(1.75);
+  transform-origin: top left;
+}
