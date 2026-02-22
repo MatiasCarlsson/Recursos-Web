@@ -5,6 +5,7 @@
   --color-buttonColor: #f1b900;
   --color-textPrimary: #f8f4e6;
   --color-textSecondary: #a9a9a9;
+  --color-cardBackground: #1a0b3c;
 }
 
 :root {
@@ -12,6 +13,12 @@
   --color-button: #f1b900;
   --color-text-primary: #f8f4e6;
   --color-text-secondary: #a9a9a9;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -30,7 +37,6 @@ h4,
 h5,
 h6 {
   color: var(--color-text-primary);
-  margin-bottom: 0.2rem;
   font-style: italic;
 }
 
