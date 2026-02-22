@@ -18,11 +18,12 @@
 html {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--color-primary);
+  overflow-x: hidden;
 }
 
 h1 {
