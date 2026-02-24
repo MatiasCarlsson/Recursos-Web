@@ -42,7 +42,7 @@ function MenuToggle() {
         </li>
         <li className={navigationStyles.linksLi}>
           <Link href="/aboutProyect" className={navigationStyles.link}>
-            Acerca del Proyecto
+            Sobre el Proyecto
           </Link>
         </li>
       </ul>
