@@ -11,6 +11,15 @@ interface ResourceCardProps {
   resource: Resource;
 }
 
+const styles = {
+  insetShadow:
+    "absolute inset-0 inset-shadow-sm inset-shadow-accent rounded-2xl pointer-events-none",
+  scaleImage:
+    "items-center hover:scale-110 transition-transform duration-500 rounded-2xl cursor-pointer active:scale-99",
+  linkResource:
+    "italic flex hover:scale-105 text-end px-3 py-1 transition-transform duration-300 text-buttonColor border-2 border-buttonColor rounded-lg active:scale-95",
+};
+
 export default function ResourceCard({ resource }: ResourceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -32,25 +41,25 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
                 height: "auto",
                 objectFit: "cover",
               }}
-              className="items-center hover:scale-110 transition-transform duration-500 rounded-2xl cursor-pointer active:scale-99 "
+              className={styles.scaleImage}
               onClick={() => setIsModalOpen(true)}
             />
 
-            <span className="absolute inset-0 inset-shadow-sm inset-shadow-accent rounded-2xl pointer-events-none"></span>
+            <span className={styles.insetShadow}></span>
           </span>
+
           <p className="font-bold text-sm border z-20 -mt-10 mx-5 flex ml-auto rounded-lg w-fit p-1 items-end">
             {formatTextFitstUpperCase(resource.category)}
           </p>
         </div>
+
         <h2 className="font-bold mt-1 text-center">{formatTextFitstUpperCase(truncatedTitle)}</h2>
+
         <div className="flex text-sm mx-3 items-center pb-4 -mt-1">
           <p className="">{truncatedContent}</p>
+
           <span>
-            <a
-              href={`${resource.url}`}
-              target="_blank"
-              className="italic flex hover:scale-105 text-end px-3 py-1 transition-transform duration-300 text-buttonColor border-2 border-buttonColor rounded-lg active:scale-95"
-            >
+            <a href={`${resource.url}`} target="_blank" className={styles.linkResource}>
               Ir
             </a>
           </span>
