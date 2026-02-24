@@ -26,12 +26,13 @@
   left: -50%;
   width: 200%;
   height: 200%;
+  /* color: rgb(124, 58, 237); */
   background: linear-gradient(
     0deg,
     transparent,
     transparent 30%,
-    rgb(241, 185, 0) 20%,
-    rgb(241, 185, 0) 40%,
+    rgb(124, 58, 237) 20%,
+    rgb(124, 58, 237) 40%,
     transparent 70%
   );
   transform: rotate(-50deg);
@@ -43,7 +44,7 @@
 /* El hover escala el enlace completo */
 .linksMenu li a:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 20px rgb(241, 185, 0);
+  box-shadow: 0 0 20px rgb(124, 58, 237);
   color: var(--color-text-primary);
 }
 

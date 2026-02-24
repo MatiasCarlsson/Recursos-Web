@@ -21,6 +21,9 @@
   --color-buttonColor: #bf00ff;
   --color-accent: #7c3aed;
   --color-glow: #d946ef;
+
+  /* Shadows */
+  --shadow-footerShadow: 0px -10px 19px 8px rgba(124, 58, 237, 0.43);
 }
 
 /* --color-primary: #0b0216; */
