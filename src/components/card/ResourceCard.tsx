@@ -19,21 +19,25 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
 
   return (
     <>
-      <article className="flex flex-col  bg-cardBackground rounded-3xl gap-4">
+      <article className="flex flex-col bg-cardBackground rounded-3xl gap-4">
         <div className="w-full flex flex-col justify-items-end">
-          <Image
-            src={resource.image}
-            alt={resource.title}
-            width={200}
-            height={200}
-            style={{
-              width: "auto",
-              height: "auto",
-              objectFit: "cover",
-            }}
-            className="items-center hover:scale-102 transition-transform duration-300 rounded-2xl cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          />
+          <span className="relative block rounded-2xl overflow-hidden">
+            <Image
+              src={resource.image}
+              alt={resource.title}
+              width={400}
+              height={400}
+              style={{
+                width: "auto",
+                height: "auto",
+                objectFit: "cover",
+              }}
+              className="items-center hover:scale-110 transition-transform duration-500 rounded-2xl cursor-pointer active:scale-99 "
+              onClick={() => setIsModalOpen(true)}
+            />
+
+            <span className="absolute inset-0 inset-shadow-sm inset-shadow-accent rounded-2xl pointer-events-none"></span>
+          </span>
           <p className="font-bold text-sm border z-20 -mt-10 mx-5 flex ml-auto rounded-lg w-fit p-1 items-end">
             {formatTextFitstUpperCase(resource.category)}
           </p>
