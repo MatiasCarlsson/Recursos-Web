@@ -5,7 +5,7 @@ import MenuToggle from "./MenuToggle";
 
 function Header() {
   return (
-    <header className="relative w-full items-center text-center z-50 bg-[#0b0f19]">
+    <header className="relative w-full items-center text-center z-50 ">
       <nav className="flex items-center w-full relative justify-between max-w-7xl mx-auto py-2 ">
         <div className="w-32 md:w-40 flex shrink-0">
           <Link href="/">
