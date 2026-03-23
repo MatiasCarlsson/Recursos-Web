@@ -1,6 +1,6 @@
 import "@/styles/global.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/page/Header";
+import Footer from "@/components/page/Footer";
 
 export default function RootLayout({
   children,
@@ -10,11 +10,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main className="h-screen">
-          <Header />
-          {children}
-          <Footer />
-        </main>
+        <Header />
+        {children}
+        <Footer />
       </body>
     </html>
   );

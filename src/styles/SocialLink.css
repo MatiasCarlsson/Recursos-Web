@@ -1,0 +1,65 @@
+/* SocialLink.css */
+
+.social-pill {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  /* Ajusta estos colores a tu paleta anterior */
+  color: #ebe5ff;
+  background: rgba(255, 255, 255, 0.05); /* Fondo sutil */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 50px; /* Forma de píldora */
+  transition: all 0.3s ease;
+  height: 40px; /* Altura fija para evitar saltos verticales */
+  cursor: pointer;
+}
+
+.social-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00e5ff; /* Tu color Cian Neón de la paleta */
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  /* Si el texto aparece, damos un pequeño margen a la derecha del ícono */
+  margin-right: 0px;
+  transition: margin 0.3s ease;
+}
+
+/* Cuando el hover está activo, separamos un poco el ícono del texto */
+.social-pill:hover .icon-container {
+  margin-right: 8px;
+}
+
+.text-container {
+  font-family: "Courier New", monospace; /* Fuentes monoespaciadas van mejor con typing */
+  font-size: 0.9rem;
+  white-space: nowrap; /* Evita que el texto baje de línea */
+  display: flex;
+  align-items: center;
+}
+
+/* EL CURSOR PARPADEANTE */
+/* Solo mostramos el cursor si estamos haciendo hover */
+.text-container.active::after {
+  content: "|";
+  display: inline-block;
+  color: #00e5ff; /* Color del cursor (Cian) */
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
