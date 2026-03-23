@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Categoria {
+  id_categoria Int          @id @default(autoincrement())
+  nombre       String?      @db.VarChar
+  slug         String?
+  creado       DateTime?    @default(now()) @db.Timestamp(6)
+  recursos     Recurso[]
+  sugerencias  Sugerencia[]
+
+  @@map("categoria")
+}
+
+model Recurso {
+  id_recurso       Int       @id @default(autoincrement())
+  id_categoria     Int?
+  id_modelo_precio Int?
+  nombre           String?   @db.VarChar
+  descripcion      String?
+  url              String?
+  creado           DateTime? @default(now()) @db.Timestamp(6)
+  actualizacion    DateTime? @updatedAt @db.Timestamp(6)
+
+  categoria        Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  modelo_precio    ModeloPrecio?     @relation(fields: [id_modelo_precio], references: [id_modelo_precio], onDelete: NoAction, onUpdate: NoAction)
+  recurso_etiqueta RecursoEtiqueta[]
+
+  @@map("recurso")
+}
+
+model Etiqueta {
+  id_etiqueta Int     @id @default(autoincrement())
+  nombre      String? @db.VarChar
+  slug        String?
+
+  recurso_etiqueta RecursoEtiqueta[]
+
+  @@map("etiqueta")
+}
+
+model RecursoEtiqueta {
+  id_recurso  Int
+  id_etiqueta Int
+
+  recurso  Recurso  @relation(fields: [id_recurso], references: [id_recurso], onDelete: NoAction, onUpdate: NoAction)
+  etiqueta Etiqueta @relation(fields: [id_etiqueta], references: [id_etiqueta], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_recurso, id_etiqueta])
+  @@map("recurso_etiqueta")
+}
+
+model Sugerencia {
+  id_sugerencia        Int       @id @default(autoincrement())
+  id_categoria         Int?
+  id_estado_sugerencia Int?
+  titulo               String?   @db.VarChar
+  descripcion          String?
+  url                  String?
+  creado               DateTime? @default(now()) @db.Timestamp(6)
+
+  categoria         Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  estado_sugerencia EstadoSugerencia? @relation(fields: [id_estado_sugerencia], references: [id_estado_sugerencia], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("sugerencia")
+}
+
+model EstadoSugerencia {
+  id_estado_sugerencia Int     @id @default(autoincrement())
+  nombre               String? @db.VarChar
+
+  sugerencias Sugerencia[]
+
+  @@map("estado_sugerencia")
+}
+
+model ModeloPrecio {
+  id_modelo_precio Int     @id @default(autoincrement())
+  nombre           String? @db.VarChar
+
+  recursos Recurso[]
+
+  @@map("modelo_precio")
+}
+
+model Admin {
+  id_admin Int      @id @default(autoincrement())
+  activo   Boolean?
+
+  @@map("admin")
+}
