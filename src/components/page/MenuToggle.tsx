@@ -1,8 +1,9 @@
 "use client";
 
+import "@/styles/menuToggle.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import "@/styles/menuToggle.css";
+import { useRouter } from "next/navigation";
 
 const navigationStyles = {
   linksLi: "w-full sm:w-auto",
@@ -13,6 +14,7 @@ const navigationStyles = {
 
 function MenuToggle() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   // Cierra el menú cuando la pantalla es mayor a 640px (breakpoint sm)
   useEffect(() => {
@@ -25,6 +27,11 @@ function MenuToggle() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    router.prefetch("/resource");
+    router.prefetch("/sobre-el-proyecto");
+  }, [router]);
 
   return (
     <>
@@ -41,7 +48,7 @@ function MenuToggle() {
           </Link>
         </li>
         <li className={navigationStyles.linksLi}>
-          <Link href="/aboutProyect" className={navigationStyles.link}>
+          <Link href="/sobre-el-proyecto" className={navigationStyles.link}>
             Sobre el Proyecto
           </Link>
         </li>
@@ -73,7 +80,7 @@ function MenuToggle() {
               </Link>
             </li>
             <li className={navigationStyles.linksLi} onClick={() => setIsOpen(false)}>
-              <Link href="/aboutProyect" className={navigationStyles.link}>
+              <Link href="/sobre-el-proyecto" className={navigationStyles.link}>
                 Acerca del Proyecto
               </Link>
             </li>
