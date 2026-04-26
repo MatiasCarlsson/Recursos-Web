@@ -73,7 +73,6 @@ h6 {
 
 p {
   color: var(--color-text-secondary);
-  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -97,8 +96,46 @@ p {
   background: #3b01a0;
 }
 
+*::selection {
+  background: var(--color-accent);
+  color: var(--color-primary);
+}
 /* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: #280168 #0a0119;
+}
+
+*::-moz-selection {
+  background: var(--color-accent);
+  color: var(--color-primary);
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition-property: opacity, transform;
+  transition-duration: 700ms;
+  transition-timing-function: cubic-bezier(0.2, 0.65, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 943px) {
+  .speakersColumn {
+    flex-direction: column;
+  }
 }

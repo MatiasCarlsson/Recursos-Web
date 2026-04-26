@@ -4,5 +4,9 @@ export interface Resource {
   url: string;
   content: string;
   image: string;
+  categoryId: number | null;
   category: string;
+  tags: string[];
+  isFeatured?: boolean;
+  createdAt?: string;
 }
