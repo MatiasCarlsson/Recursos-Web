@@ -4,6 +4,7 @@ export const createResourceSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio"),
   descripcion: z.string(),
   url: z.string().url(),
+  destacado: z.boolean().optional(),
   categoriaId: z.number().optional(),
   modeloPrecioId: z.number().optional(),
   etiquetas: z.array(z.number()).optional(),
