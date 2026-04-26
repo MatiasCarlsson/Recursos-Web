@@ -3,13 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Categoria {
   id_categoria Int          @id @default(autoincrement())
   nombre       String?      @db.VarChar
-  slug         String?
+  descripcion  String?
+  slug         String?      @unique
   creado       DateTime?    @default(now()) @db.Timestamp(6)
   recursos     Recurso[]
   sugerencias  Sugerencia[]
@@ -18,27 +21,28 @@ model Categoria {
 }
 
 model Recurso {
-  id_recurso       Int       @id @default(autoincrement())
+  id_recurso       Int               @id @default(autoincrement())
   id_categoria     Int?
   id_modelo_precio Int?
-  nombre           String?   @db.VarChar
+  nombre           String?           @db.VarChar
   descripcion      String?
   url              String?
-  creado           DateTime? @default(now()) @db.Timestamp(6)
-  actualizacion    DateTime? @updatedAt @db.Timestamp(6)
-
+  creado           DateTime?         @default(now()) @db.Timestamp(6)
+  actualizacion    DateTime?         @updatedAt @db.Timestamp(6)
+  destacado        Boolean           @default(false)
   categoria        Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   modelo_precio    ModeloPrecio?     @relation(fields: [id_modelo_precio], references: [id_modelo_precio], onDelete: NoAction, onUpdate: NoAction)
   recurso_etiqueta RecursoEtiqueta[]
 
+  @@index([destacado, creado])
   @@map("recurso")
 }
 
 model Etiqueta {
-  id_etiqueta Int     @id @default(autoincrement())
-  nombre      String? @db.VarChar
-  slug        String?
-
+  id_etiqueta      Int               @id @default(autoincrement())
+  nombre           String?           @db.VarChar
+  descripcion      String?
+  slug             String?
   recurso_etiqueta RecursoEtiqueta[]
 
   @@map("etiqueta")
@@ -47,50 +51,52 @@ model Etiqueta {
 model RecursoEtiqueta {
   id_recurso  Int
   id_etiqueta Int
-
-  recurso  Recurso  @relation(fields: [id_recurso], references: [id_recurso], onDelete: NoAction, onUpdate: NoAction)
-  etiqueta Etiqueta @relation(fields: [id_etiqueta], references: [id_etiqueta], onDelete: NoAction, onUpdate: NoAction)
+  etiqueta    Etiqueta @relation(fields: [id_etiqueta], references: [id_etiqueta], onDelete: NoAction, onUpdate: NoAction)
+  recurso     Recurso  @relation(fields: [id_recurso], references: [id_recurso], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_recurso, id_etiqueta])
   @@map("recurso_etiqueta")
 }
 
 model Sugerencia {
-  id_sugerencia        Int       @id @default(autoincrement())
+  id_sugerencia        Int               @id @default(autoincrement())
   id_categoria         Int?
   id_estado_sugerencia Int?
-  titulo               String?   @db.VarChar
+  titulo               String?           @db.VarChar
   descripcion          String?
   url                  String?
-  creado               DateTime? @default(now()) @db.Timestamp(6)
-
-  categoria         Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
-  estado_sugerencia EstadoSugerencia? @relation(fields: [id_estado_sugerencia], references: [id_estado_sugerencia], onDelete: NoAction, onUpdate: NoAction)
+  categoria_sugerida   String?           @db.VarChar(120)
+  email_contacto       String?           @db.VarChar(255)
+  creado               DateTime?         @default(now()) @db.Timestamp(6)
+  categoria            Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  estado_sugerencia    EstadoSugerencia? @relation(fields: [id_estado_sugerencia], references: [id_estado_sugerencia], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("sugerencia")
 }
 
 model EstadoSugerencia {
-  id_estado_sugerencia Int     @id @default(autoincrement())
-  nombre               String? @db.VarChar
-
-  sugerencias Sugerencia[]
+  id_estado_sugerencia Int          @id @default(autoincrement())
+  nombre               String?      @db.VarChar
+  sugerencias          Sugerencia[]
 
   @@map("estado_sugerencia")
 }
 
 model ModeloPrecio {
-  id_modelo_precio Int     @id @default(autoincrement())
-  nombre           String? @db.VarChar
-
-  recursos Recurso[]
+  id_modelo_precio Int       @id @default(autoincrement())
+  nombre           String?   @db.VarChar
+  recursos         Recurso[]
 
   @@map("modelo_precio")
 }
 
 model Admin {
-  id_admin Int      @id @default(autoincrement())
-  activo   Boolean?
+  id_admin      Int      @id @default(autoincrement())
+  email         String   @unique @db.VarChar(255)
+  password_hash String   @db.VarChar(255)
+  role          String   @default("admin") @db.VarChar(50)
+  activo        Boolean  @default(true)
+  creado        DateTime @default(now()) @db.Timestamp(6)
 
   @@map("admin")
 }
