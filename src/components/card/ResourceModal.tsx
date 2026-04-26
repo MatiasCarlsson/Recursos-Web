@@ -5,11 +5,12 @@ import { Resource } from "@/types/resource";
 
 interface ResourceModalProps {
   resource: Resource;
+  imageSrc?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function ResourceModal({ resource, isOpen, onClose }: ResourceModalProps) {
+export default function ResourceModal({ resource, imageSrc, isOpen, onClose }: ResourceModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -23,31 +24,59 @@ export default function ResourceModal({ resource, isOpen, onClose }: ResourceMod
       >
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-2xl font-bold flex-1">{resource.title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-3xl ml-4">
-            ×
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={onClose}
+            className="text-gray-400 hover:text-violet-600 text-xl ml-4 items-center cursor-pointer transition-transform duration-600 ease-out hover:rotate-280 hover:scale-110 p-0 leading-none"
+          >
+            ✕
           </button>
         </div>
 
         <Image
-          src={resource.image}
+          src={imageSrc ?? resource.image}
           alt={resource.title}
           width={800}
           height={400}
+          unoptimized
+          loading="eager"
+          priority
           className="rounded-lg mb-4 w-full aspect-video object-cover"
         />
 
         <p className="text-gray-300 mb-4">{resource.content}</p>
 
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-blue-400">{resource.category}</span>
+        <div className="mb-4 flex justify-end">
           <a
             href={resource.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            className="rounded-lg border border-buttonColor/70 bg-buttonColor/20 px-4 py-2 font-semibold text-textPrimary transition-all hover:bg-buttonColor/35 hover:border-buttonColor hover:scale-[1.02]"
           >
             Ver recurso
           </a>
+        </div>
+
+        <div className="mt-6 flex items-end justify-between gap-3 border-t border-white/10 pt-4">
+          <div className="flex flex-wrap gap-2">
+            {resource.tags.length > 0 ? (
+              resource.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200"
+                >
+                  {tag}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-400">Sin etiquetas</span>
+            )}
+          </div>
+
+          <span className="text-xs font-medium rounded-full border border-indigo-400/40 bg-indigo-500/15 px-2 py-1 text-indigo-200">
+            {resource.category}
+          </span>
         </div>
       </div>
     </div>
