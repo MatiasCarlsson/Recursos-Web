@@ -1,65 +1,48 @@
 import { NextResponse } from "next/server";
+export const runtime = "nodejs";
 import { ResourceService } from "@/modules/resources/resource.service";
 import { createResourceSchema } from "@/modules/resources/schemas/resource.create.schema";
-import { ZodError } from "zod";
+import { resourcesQuerySchema } from "@/modules/resources/schemas/resource.query.schema";
+import { toErrorResponse } from "@/lib/api-error-response";
+import { requireAdmin } from "@/lib/require-admin";
 
 const service = new ResourceService();
 
 // Get all resources (GET /api/resources)
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-
-    const page = searchParams.get("page") ? Number(searchParams.get("page")) : 1;
-    const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : 10;
-    const search = searchParams.get("search") || undefined;
-    const categoriaId = searchParams.get("categoriaId")
-      ? Number(searchParams.get("categoriaId"))
-      : undefined;
-    const modeloPrecioId = searchParams.get("modeloPrecioId")
-      ? Number(searchParams.get("modeloPrecioId"))
-      : undefined;
-    const sortBy = (searchParams.get("sortBy") || "creado") as
-      | "nombre"
-      | "creado"
-      | "actualizacion";
-    const sort = (searchParams.get("sort") || "desc") as "asc" | "desc";
-
-    // Validar parámetros
-    if (page < 1 || limit < 1 || limit > 100) {
-      return NextResponse.json({ error: "Invalid pagination parameters" }, { status: 400 });
-    }
+    const rawQuery = Object.fromEntries(new URL(request.url).searchParams.entries());
+    const query = resourcesQuerySchema.parse(rawQuery);
 
     const result = await service.getResourcesPaginated({
-      page,
-      limit,
-      search,
-      categoriaId,
-      modeloPrecioId,
-      sortBy,
-      sort,
+      page: query.page,
+      limit: query.limit,
+      search: query.search,
+      destacado: query.destacado,
+      categoriaId: query.categoriaId,
+      modeloPrecioId: query.modeloPrecioId,
+      etiquetaId: query.etiquetaId,
+      sortBy: query.sortBy,
+      sort: query.sort,
     });
 
     return NextResponse.json(result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected error";
-    return NextResponse.json({ error: `Error fetching resources: ${message}` }, { status: 500 });
+    return toErrorResponse(error);
   }
 }
 
 // Post a new resource (POST /api/resources)
 export async function POST(request: Request) {
   try {
+    // Solo un admin autenticado puede crear recursos.
+    await requireAdmin();
+
     const body = await request.json();
     const data = createResourceSchema.parse(body);
     const resource = await service.createResource(data);
     return NextResponse.json(resource, { status: 201 });
-  } catch (e) {
-    if (e instanceof ZodError) {
-      return NextResponse.json({ error: "Invalid payload", details: e.issues }, { status: 400 });
-    }
-
-    const message = e instanceof Error ? e.message : "Unexpected error";
-    return NextResponse.json({ error: `Error creating resource: ${message}` }, { status: 500 });
+  } catch (error) {
+    return toErrorResponse(error);
   }
 }
