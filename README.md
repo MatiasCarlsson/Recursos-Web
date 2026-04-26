@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Recursos Web
 
-## Getting Started
+Plataforma para descubrir recursos útiles de desarrollo web con curación manual, filtros por categorías y etiquetas, y un panel de administración para mantener la calidad del catálogo.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router)
+- TypeScript
+- Prisma + PostgreSQL
+- NextAuth
+- Tailwind CSS v4
+- Zod
+
+## Scripts
+
+Usando pnpm:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
+pnpm build
+pnpm start
+pnpm lint
+pnpm admin:create
+pnpm admin:delete
+pnpm previews:refresh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variables de Entorno
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Variables principales esperadas por el proyecto:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `DATABASE_URL`
+- `DIRECT_URL` (si aplica para Prisma)
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD_HASH`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (opcional)
+- `TURNSTILE_SECRET_KEY` (opcional)
 
-## Learn More
+## Módulos Principales
 
-To learn more about Next.js, take a look at the following resources:
+- Catálogo público de recursos con filtros y búsqueda.
+- Gestión de categorías, etiquetas y recursos desde el panel admin.
+- Recepción de sugerencias de la comunidad con validación y control anti-spam.
+- Página "Acerca del proyecto" con narrativa del producto, animaciones de entrada y efectos hover para una experiencia más dinámica.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Seguridad en Sugerencias
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+El endpoint público `/api/suggestions` aplica:
 
-## Deploy on Vercel
+- Estado inicial `pendiente` para usuarios no admin.
+- Rate limit por IP y correo de contacto.
+- Campo honeypot para bots básicos.
+- Integración opcional con Cloudflare Turnstile.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Si `TURNSTILE_SECRET_KEY` no está definida, la validación de captcha se omite.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Endpoints
+
+Lista de endpoints públicos y métodos HTTP principales expuestos por la app (base: `/api`).
+
+- **/api/auth** — `GET`, `POST`
+  - Proveedor NextAuth para autenticación (login/logout, callbacks).
+
+- **/api/resources** — `GET`, `POST`
+  - `GET /api/resources` : lista paginada y filtros (search, categoriaId, etiquetaId, destacado, modeloPrecioId, sort, page, limit).
+  - `POST /api/resources` : crear recurso (requiere admin autenticado).
+
+- **/api/resources/:id** — `GET`, `PUT`, `DELETE`
+  - `GET /api/resources/:id` : obtener recurso por id.
+  - `PUT /api/resources/:id` : actualizar recurso (requiere admin).
+  - `DELETE /api/resources/:id` : eliminar recurso (requiere admin).
+
+- **/api/categories** — `GET`, `POST`
+  - `GET /api/categories` : lista paginada de categorías (query params disponibles).
+  - `POST /api/categories` : crear categoría (requiere admin).
+
+- **/api/categories/:id** — `GET`, `PUT`, `DELETE`
+  - `GET /api/categories/:id` : obtener categoría por id.
+  - `PUT /api/categories/:id` : actualizar categoría (requiere admin).
+  - `DELETE /api/categories/:id` : eliminar categoría (requiere admin).
+
+- **/api/tags** — `GET`, `POST`
+  - `GET /api/tags` : lista paginada de etiquetas (query params disponibles).
+  - `POST /api/tags` : crear etiqueta (requiere admin).
+
+- **/api/tags/:id** — `GET`, `PUT`, `DELETE`
+  - `GET /api/tags/:id` : obtener etiqueta por id.
+  - `PUT /api/tags/:id` : actualizar etiqueta (requiere admin).
+  - `DELETE /api/tags/:id` : eliminar etiqueta (requiere admin).
+
+- **/api/suggestions** — `GET`, `POST`
+  - `GET /api/suggestions` : lista paginada de sugerencias (admin view).
+  - `POST /api/suggestions` : crear sugerencia pública (rate-limit, honeypot y opcional Turnstile). Si el usuario es admin, crea sugerencia directamente.
+
+- **/api/suggestions/:id** — `GET`, `PUT`, `DELETE`
+  - `GET /api/suggestions/:id` : obtener sugerencia por id.
+  - `PUT /api/suggestions/:id` : actualizar sugerencia (requiere admin).
+  - `DELETE /api/suggestions/:id` : eliminar sugerencia (requiere admin).
+
+- **/api/price-models** — `GET`, `POST`
+  - `GET /api/price-models` : lista de modelos de precio.
+  - `POST /api/price-models` : crear modelo de precio (requiere admin).
+
+- **/api/suggestion-statuses** — `GET`
+  - `GET /api/suggestion-statuses` : lista de estados posibles para sugerencias.
+
+Nota: muchos endpoints de escritura (`POST`, `PUT`, `DELETE`) requieren que el usuario sea admin y autenticado; la verificación se realiza en el servidor con `requireAdmin()` o verificando la sesión de `next-auth`.
