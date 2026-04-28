@@ -147,7 +147,7 @@ function SugestionsForResources() {
 
         <form onSubmit={handleSubmit} className="relative space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            <label htmlFor="resource-name" className="sm:col-span-2">
+            <label htmlFor="resource-name">
               <span className={labelClass}>Título del recurso</span>
               <input
                 type="text"
@@ -159,8 +159,7 @@ function SugestionsForResources() {
                 className={fieldBaseClass}
               />
             </label>
-
-            <label htmlFor="resource-url" className="sm:col-span-2">
+            <label htmlFor="resource-url">
               <span className={labelClass}>URL del recurso</span>
               <input
                 type="url"
