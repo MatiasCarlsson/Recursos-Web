@@ -48,7 +48,7 @@ const initialResourceForm: ResourceForm = {
 const PAGE_SIZE = 20;
 
 function buildResourcesQuery(page: number) {
-  return `${API_ENDPOINTS.resources}?limit=${PAGE_SIZE}&page=${page}`;
+  return `${API_ENDPOINTS.adminResources}?limit=${PAGE_SIZE}&page=${page}`;
 }
 
 export default function ResourceCrudSection() {
@@ -299,7 +299,9 @@ export default function ResourceCrudSection() {
 
     try {
       const isEdit = editingId !== null;
-      const url = isEdit ? `${API_ENDPOINTS.resources}/${editingId}` : API_ENDPOINTS.resources;
+      const url = isEdit
+        ? `${API_ENDPOINTS.adminResources}/${editingId}`
+        : API_ENDPOINTS.adminResources;
       const payload: MutationPayload = buildPayload({
         nombre: form.nombre,
         descripcion: form.descripcion,
@@ -337,7 +339,7 @@ export default function ResourceCrudSection() {
     setError(null);
 
     try {
-      await performMutation(`${API_ENDPOINTS.resources}/${item.id_recurso}`, "DELETE");
+      await performMutation(`${API_ENDPOINTS.adminResources}/${item.id_recurso}`, "DELETE");
       await refreshResources(currentPage);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo eliminar el recurso");

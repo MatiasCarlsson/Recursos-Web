@@ -306,9 +306,9 @@ export default function AdminEntitySection<TItem, TForm extends Record<string, s
           </thead>
           <tbody>
             {hasItems ? (
-              items.map((item) => (
+              items.map((item, index) => (
                 <tr
-                  key={getKey(item)}
+                  key={`${String(getKey(item))}-${index}`}
                   className="border-b border-border/30 text-textPrimary transition-colors hover:bg-white/3"
                 >
                   {columns.map((column) => (

@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   priceModels: "/api/price-models",
   suggestionStatuses: "/api/suggestion-statuses",
   resources: "/api/resources",
+  adminResources: "/api/admin/resources",
   suggestions: "/api/suggestions",
 } as const;
 
