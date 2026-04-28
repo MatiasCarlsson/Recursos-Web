@@ -28,7 +28,10 @@ export default function ResourceCard({
   prioritizeImage = false,
 }: ResourceCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imageSrc, setImageSrc] = useState(resource.image);
+  const fallbackImageSrc = `https://dummyimage.com/1200x675/0f172a/e2e8f0.png?text=${encodeURIComponent(
+    resource.title || "Recurso",
+  )}`;
+  const [imageSrc, setImageSrc] = useState(resource.image?.trim() || fallbackImageSrc);
   const isCompact = variant === "compact";
 
   const truncatedContent = truncateText(resource.content, isCompact ? 58 : 90);
@@ -54,10 +57,7 @@ export default function ResourceCard({
               className={styles.scaleImage}
               onClick={() => setIsModalOpen(true)}
               onError={() => {
-                const encodedTitle = encodeURIComponent(resource.title || "Recurso");
-                setImageSrc(
-                  `https://dummyimage.com/1200x675/0f172a/e2e8f0.png?text=${encodedTitle}`,
-                );
+                setImageSrc(fallbackImageSrc);
               }}
             />
 
