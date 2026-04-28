@@ -1,5 +1,5 @@
 import { loadResourceFilters } from "@/api/api";
-import Card from "@/components/card/Card";
+import ClientCard from "@/components/card/ClientCard";
 import SearchBar from "@/components/SearchBar";
 import ResourceFilters from "@/components/resource/ResourceFilters";
 
@@ -85,7 +85,7 @@ export default async function Resources({ searchParams }: ResourcesPageProps) {
           />
         </div>
 
-        <Card
+        <ClientCard
           categoryIds={selectedCategoryIds.length ? selectedCategoryIds : undefined}
           tagIds={selectedTagIds.length ? selectedTagIds : undefined}
           priceModelIds={selectedPriceModelIds.length ? selectedPriceModelIds : undefined}

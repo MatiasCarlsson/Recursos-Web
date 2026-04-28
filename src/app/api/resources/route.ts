@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 export const runtime = "nodejs";
-import { ResourceService } from "@/modules/resources/resource.service";
 import { createResourceSchema } from "@/modules/resources/schemas/resource.create.schema";
 import { resourcesQuerySchema } from "@/modules/resources/schemas/resource.query.schema";
 import { toErrorResponse } from "@/lib/api-error-response";
 import { requireAdmin } from "@/lib/require-admin";
-
-const service = new ResourceService();
+import { loadResourcesPaginated } from "@/api/api";
 
 // Get all resources (GET /api/resources)
 export async function GET(request: Request) {
@@ -14,16 +12,13 @@ export async function GET(request: Request) {
     const rawQuery = Object.fromEntries(new URL(request.url).searchParams.entries());
     const query = resourcesQuerySchema.parse(rawQuery);
 
-    const result = await service.getResourcesPaginated({
+    const result = await loadResourcesPaginated({
       page: query.page,
       limit: query.limit,
       search: query.search,
-      destacado: query.destacado,
-      categoriaId: query.categoriaId,
-      modeloPrecioId: query.modeloPrecioId,
-      etiquetaId: query.etiquetaId,
-      sortBy: query.sortBy,
-      sort: query.sort,
+      categoriaIds: query.categoriaId ? [query.categoriaId] : undefined,
+      etiquetaIds: query.etiquetaId ? [query.etiquetaId] : undefined,
+      modeloPrecioIds: query.modeloPrecioId ? [query.modeloPrecioId] : undefined,
     });
 
     return NextResponse.json(result);
