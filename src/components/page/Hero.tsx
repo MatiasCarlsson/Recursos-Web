@@ -50,6 +50,12 @@ async function Hero() {
             Sugerir un recurso
           </Link>
           <Link
+            href="/sobre-el-proyecto#apoya"
+            className="rounded-xl border border-buttonColor/60 bg-buttonColor/10 px-5 py-2.5 text-sm font-semibold text-textPrimary transition hover:scale-[1.02] hover:border-buttonColor hover:bg-buttonColor/20"
+          >
+            Apoya 😉
+          </Link>
+          <Link
             href="/#destacados"
             className="rounded-xl border border-border/80 bg-cardBackground/70 px-5 py-2.5 text-sm font-semibold text-textPrimary transition hover:scale-[1.02] hover:border-buttonColor/60"
           >
