@@ -6,6 +6,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import Hero from "@/components/page/Hero";
 import { loadFeaturedResources, loadRecentWeeklyResources } from "@/api/api";
 
+export const revalidate = 600;
+
 export default async function Home() {
   const [featuredResources, recentWeeklyResources] = await Promise.all([
     loadFeaturedResources(),
