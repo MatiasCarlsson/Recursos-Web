@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import ResourceCard from "./ResourceCard";
 
 interface ClientCardProps {
@@ -86,10 +87,9 @@ export default function ClientCard({
     q.set("limit", "15");
     q.set("page", String(page ?? 1));
     if (search) q.set("search", String(search));
-    // The API expects singular ids; send the first of each array when present
-    if (categoryIds && categoryIds.length) q.set("categoriaId", String(categoryIds[0]));
-    if (tagIds && tagIds.length) q.set("etiquetaId", String(tagIds[0]));
-    if (priceModelIds && priceModelIds.length) q.set("modeloPrecioId", String(priceModelIds[0]));
+    if (categoryIds && categoryIds.length) q.set("categoryIds", categoryIds.join(","));
+    if (tagIds && tagIds.length) q.set("tagIds", tagIds.join(","));
+    if (priceModelIds && priceModelIds.length) q.set("priceModelIds", priceModelIds.join(","));
 
     fetch(`/api/resources?${q.toString()}`)
       .then((res) => res.json())
@@ -220,35 +220,35 @@ export default function ClientCard({
 
       {pagination ? (
         <div className="mt-6 flex items-center justify-center gap-4">
-          <a
+          <Link
             href={buildQuery({
               categoryIds,
               tagIds,
               priceModelIds,
               search,
-              page: pagination.currentPage - 1,
+              page: (pagination.currentPage || page || 1) - 1,
             })}
             className={`bg-buttonColor text-buttonText px-3 py-2 rounded-lg border ${pagination.hasPreviousPage ? "" : "opacity-40 pointer-events-none"}`}
           >
             Anterior
-          </a>
+          </Link>
 
           <span className="px-3 py-2 text-sm text-textSecondary">
-            Página {pagination.currentPage} / {pagination.totalPages}
+            Página {pagination.currentPage || page || 1} / {pagination.totalPages}
           </span>
 
-          <a
+          <Link
             href={buildQuery({
               categoryIds,
               tagIds,
               priceModelIds,
               search,
-              page: pagination.currentPage + 1,
+              page: (pagination.currentPage || page || 1) + 1,
             })}
             className={`bg-buttonColor text-buttonText px-3 py-2 rounded-lg border ${pagination.hasNextPage ? "" : "opacity-40 pointer-events-none"}`}
           >
             Siguiente
-          </a>
+          </Link>
         </div>
       ) : null}
     </section>
