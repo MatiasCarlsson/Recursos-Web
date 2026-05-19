@@ -1,5 +1,9 @@
 import Image from "next/image";
 import ScrollReveal from "../../components/ScrollReveal";
+import SupportSection from "@/components/about/SupportSection";
+import ContactForm from "@/components/about/ContactForm";
+
+export const dynamic = "force-static";
 
 const heroTags = ["Revisión manual", "Enfoque en calidad", "Evolución continua"];
 
@@ -167,12 +171,13 @@ export default function AboutProjectPage() {
 
         <div className="shrink-0 flex flex-col items-center gap-3">
           <div className="flex size-32 items-center justify-center overflow-hidden rounded-full border-2 border-buttonColor/35 bg-cardBackground shadow-[0_0_30px_rgba(124,58,237,0.2)] hover:scale-110 transition-transform duration-500">
-            <img
-              src="/image/Perfil_RecursosWeb(1).png"
+            <Image
+              src="/image/Perfil_RecursosWeb(1).webp"
               alt="Foto de Matias"
               width={128}
               height={128}
-              className="size-full object-cover select-none "
+              className="size-full object-cover select-none"
+              unoptimized
             />
           </div>
           <span className="text-center font-mono text-[12px] leading-relaxed text-textSecondary">
@@ -291,6 +296,36 @@ export default function AboutProjectPage() {
             convertir este proyecto en una plataforma comunitaria donde encontrar recursos sea cada
             vez más preciso, transparente y útil, tanto para perfiles junior como senior.
           </p>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal delayMs={380}>
+        <SupportSection />
+      </ScrollReveal>
+
+      <ScrollReveal delayMs={440}>
+        <section id="contacto" className="pt-6 sm:pt-10">
+          <div className={`${panelClass} ${panelMotionClass} p-6 sm:p-8`}>
+            <p className={`${sectionLabelClass} mb-4`}>contacto</p>
+            <div className="grid gap-6 lg:grid-cols-[1.1fr_1.2fr]">
+              <div>
+                <h2 className="mb-3 text-2xl font-semibold italic text-textPrimary sm:text-3xl">
+                  Hablemos de ideas, recursos o mejoras.
+                </h2>
+                <p className={`${bodyTextClass} mb-4`}>
+                  Si queres aportar sugerencias, reportar algo o proponer colaboraciones, este es el
+                  canal directo. Respondo personalmente.
+                </p>
+                <div className="rounded-2xl border border-border/30 bg-primaryColor/35 p-4">
+                  <p className="mt-2 text-xs text-textSecondary">
+                    Usa el formulario o copia el correo desde el footer.
+                  </p>
+                </div>
+              </div>
+
+              <ContactForm />
+            </div>
+          </div>
         </section>
       </ScrollReveal>
     </main>
