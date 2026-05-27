@@ -3,7 +3,7 @@
 import { useState, type MouseEventHandler } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useTypingEffect } from "@/components/hooks/useTypingEffect";
+import { useTypingEffect } from "@/components/Hooks/useTypingEffect";
 
 interface SocialMediaProps {
   href: string;
