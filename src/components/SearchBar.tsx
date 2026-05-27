@@ -2,7 +2,7 @@
 
 import type { SubmitEvent } from "react";
 import { useRouter } from "next/navigation";
-import useSearch, { SearchCategory, SearchTag } from "@/components/hooks/useSearch";
+import useSearch, { SearchCategory, SearchTag } from "@/components/Hooks/useSearch";
 
 interface SearchBarProps {
   categories: SearchCategory[];
