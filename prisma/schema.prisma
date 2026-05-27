@@ -8,18 +8,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Categoria {
   id_categoria Int          @id @default(autoincrement())
   nombre       String?      @db.VarChar
-  descripcion  String?
   slug         String?      @unique
   creado       DateTime?    @default(now()) @db.Timestamp(6)
+  descripcion  String?
   recursos     Recurso[]
   sugerencias  Sugerencia[]
 
   @@map("categoria")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Recurso {
   id_recurso       Int               @id @default(autoincrement())
   id_categoria     Int?
@@ -35,14 +37,19 @@ model Recurso {
   recurso_etiqueta RecursoEtiqueta[]
 
   @@index([destacado, creado])
+  @@index([id_categoria], map: "recurso_categoria_idx")
+  @@index([creado(sort: Desc), id_recurso(sort: Desc)], map: "recurso_creado_id_idx")
+  @@index([destacado, actualizacion(sort: Desc), creado(sort: Desc)], map: "recurso_destacado_actualizacion_idx")
+  @@index([id_modelo_precio], map: "recurso_modelo_precio_idx")
   @@map("recurso")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Etiqueta {
   id_etiqueta      Int               @id @default(autoincrement())
   nombre           String?           @db.VarChar
-  descripcion      String?
   slug             String?
+  descripcion      String?
   recurso_etiqueta RecursoEtiqueta[]
 
   @@map("etiqueta")
@@ -55,6 +62,7 @@ model RecursoEtiqueta {
   recurso     Recurso  @relation(fields: [id_recurso], references: [id_recurso], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_recurso, id_etiqueta])
+  @@index([id_etiqueta, id_recurso], map: "recurso_etiqueta_etiqueta_idx")
   @@map("recurso_etiqueta")
 }
 
@@ -65,9 +73,9 @@ model Sugerencia {
   titulo               String?           @db.VarChar
   descripcion          String?
   url                  String?
+  creado               DateTime?         @default(now()) @db.Timestamp(6)
   categoria_sugerida   String?           @db.VarChar(120)
   email_contacto       String?           @db.VarChar(255)
-  creado               DateTime?         @default(now()) @db.Timestamp(6)
   categoria            Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
   estado_sugerencia    EstadoSugerencia? @relation(fields: [id_estado_sugerencia], references: [id_estado_sugerencia], onDelete: NoAction, onUpdate: NoAction)
 
@@ -92,11 +100,11 @@ model ModeloPrecio {
 
 model Admin {
   id_admin      Int      @id @default(autoincrement())
+  activo        Boolean  @default(true)
+  creado        DateTime @default(now()) @db.Timestamp(6)
   email         String   @unique @db.VarChar(255)
   password_hash String   @db.VarChar(255)
   role          String   @default("admin") @db.VarChar(50)
-  activo        Boolean  @default(true)
-  creado        DateTime @default(now()) @db.Timestamp(6)
 
   @@map("admin")
 }
