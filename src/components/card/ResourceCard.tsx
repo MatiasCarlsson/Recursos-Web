@@ -47,10 +47,9 @@ export default function ResourceCard({
             <Image
               src={imageSrc}
               alt={resource.title}
-              width={400}
-              height={225}
-              // unoptimized to allow for dynamic image loading and error handling
-
+              width={1200}
+              height={675}
+              quality={85}
               priority={prioritizeImage}
               loading={prioritizeImage ? "eager" : "lazy"}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
