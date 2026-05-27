@@ -37,9 +37,10 @@ export default function ResourceModal({ resource, imageSrc, isOpen, onClose }: R
         <Image
           src={imageSrc ?? resource.image}
           alt={resource.title}
-          width={800}
-          height={400}
-          unoptimized
+          width={1200}
+          height={675}
+          sizes="(max-width: 1024px) 100vw, 900px"
+          quality={90}
           loading="eager"
           priority
           className="rounded-lg mb-4 w-full aspect-video object-cover"
