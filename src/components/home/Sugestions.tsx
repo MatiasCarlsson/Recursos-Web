@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { FormEvent, useState } from "react";
-import useSearch from "../hooks/useSearch";
+import useSearch from "../Hooks/useSearch";
 import SuggestionOptionSelector from "./SuggestionOptionSelector";
 
 function SugestionsForResources() {
