@@ -8,7 +8,7 @@ function Speakers() {
       <p className="text-center">
         Influyentes de la comunidad técnica que recomiendo en habla hispana
       </p>
-      <article className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 text-center text-sec mt-6">
+      <article className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 text-center text-sec mt-6 ">
         <Speacker
           nombrePersonal="Carlos Azaustre"
           nombreRedes="Fazt"
@@ -33,6 +33,16 @@ function Speakers() {
           enlace="https://mouredev.pro/"
           canal="https://www.youtube.com/@mouredev"
         />
+        <div className="lg:col-start-2">
+        <Speacker
+          nombrePersonal="Luisina de Paula"
+          nombreRedes="TodoCode"
+          descripcion="Desarrolladora de software y creadora de contenido enfocada en Java y la formación tecnológica. A través de sus tutoriales y cursos, ayuda a la comunidad a aprender programación desde cero de forma clara, didáctica y orientada al mundo laboral."
+          imagenUrl="/image/todocode.webp"
+          enlace="https://todocodeacademy.com/"
+          canal="https://www.youtube.com/@TodoCode"
+          />
+        </div>
       </article>
     </section>
   );
