@@ -197,7 +197,7 @@ function useSearch(options: UseSearchOptions) {
   }
 
   function selectCategory(category: SearchCategory) {
-    setSelectedCategoryId(category.id);
+    setSelectedCategoryId((previous) => (previous === category.id ? null : category.id));
     setIsPanelOpen(false);
   }
 

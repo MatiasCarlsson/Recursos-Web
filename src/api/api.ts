@@ -52,6 +52,28 @@ export interface PaginatedResources {
   };
 }
 
+const MAX_COMBINED_FILTER_RESULTS = 500;
+
+function paginateResourceList(resources: Resource[], page: number, limit: number): PaginatedResources {
+  const total = resources.length;
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+  const currentPage = totalPages === 0 ? 1 : Math.min(Math.max(page, 1), totalPages);
+  const start = (currentPage - 1) * limit;
+  const end = start + limit;
+
+  return {
+    data: resources.slice(start, end),
+    pagination: {
+      total,
+      totalPages,
+      currentPage,
+      limit,
+      hasNextPage: currentPage < totalPages,
+      hasPreviousPage: currentPage > 1,
+    },
+  };
+}
+
 async function mapResourcesToViewModel(
   resources: Awaited<ReturnType<ResourceService["getAllResource"]>>,
 ): Promise<Resource[]> {
@@ -121,6 +143,56 @@ export async function loadResourcesPaginated(
   const hasCategory = Boolean(filters?.categoryIds?.length);
   const hasTag = Boolean(filters?.tagIds?.length);
   const hasPriceModel = Boolean(filters?.priceModelIds?.length);
+  const hasCategoryAndTag = hasCategory && hasTag;
+
+  if (hasCategoryAndTag) {
+    const [strictResult, byCategoryResult, byTagResult] = await Promise.all([
+      service.getResourcesPaginated({
+        page: 1,
+        limit: MAX_COMBINED_FILTER_RESULTS,
+        search: normalizedSearch,
+        categoriaIds: filters?.categoryIds,
+        etiquetaIds: filters?.tagIds,
+        modeloPrecioIds: filters?.priceModelIds,
+        sortBy: "creado",
+        sort: "desc",
+      }),
+      service.getResourcesPaginated({
+        page: 1,
+        limit: MAX_COMBINED_FILTER_RESULTS,
+        search: normalizedSearch,
+        categoriaIds: filters?.categoryIds,
+        modeloPrecioIds: filters?.priceModelIds,
+        sortBy: "creado",
+        sort: "desc",
+      }),
+      service.getResourcesPaginated({
+        page: 1,
+        limit: MAX_COMBINED_FILTER_RESULTS,
+        search: normalizedSearch,
+        etiquetaIds: filters?.tagIds,
+        modeloPrecioIds: filters?.priceModelIds,
+        sortBy: "creado",
+        sort: "desc",
+      }),
+    ]);
+
+    const strictResources = await mapResourcesToViewModel(strictResult.data);
+    const categoryResources = await mapResourcesToViewModel(byCategoryResult.data);
+    const tagResources = await mapResourcesToViewModel(byTagResult.data);
+
+    const strictIds = new Set(strictResources.map((resource) => resource.id));
+    const merged: Resource[] = [...strictResources];
+
+    for (const resource of [...categoryResources, ...tagResources]) {
+      if (!strictIds.has(resource.id)) {
+        strictIds.add(resource.id);
+        merged.push(resource);
+      }
+    }
+
+    return paginateResourceList(merged, page, limit);
+  }
 
   if (hasSearch || hasCategory || hasTag || hasPriceModel) {
     const result = await service.getResourcesPaginated({

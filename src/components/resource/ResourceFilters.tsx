@@ -126,23 +126,25 @@ export default function ResourceFilters({
   }
 
   const hasChanges = !areSameFilters(draftFilters, activeFilters);
-  const selectedCount =
-    draftFilters.categoryIds.length +
-    draftFilters.tagIds.length +
-    draftFilters.priceModelIds.length;
-
   return (
     <aside className="rounded-2xl border border-border/70 bg-cardBackground/70 p-4">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between ">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-textSecondary">
             Filtros
           </h2>
-          <p className="text-xs text-textSecondary/80">{selectedCount} seleccionados</p>
-          <p className="text-[11px] text-textSecondary/70">Se combinan entre si</p>
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={applyFilters}
+            disabled={!hasChanges || isPending}
+            className="rounded-lg bg-buttonColor px-3 py-1.5 text-xs font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 whitespace-nowrap"
+          >
+            {isPending ? "Aplicando..." : "Aplicar filtros"}
+          </button>
+
           <button
             type="button"
             onClick={clearFilters}
@@ -176,13 +178,8 @@ export default function ResourceFilters({
                   type="button"
                   key={category.id}
                   onClick={() => toggleDraftFilter("categoryIds", category.id)}
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    isChecked
-                      ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary"
-                      : "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"
-                  }`}
-                  aria-pressed={isChecked}
-                >
+                  className={`rounded-full border px-2 py-1.5 text-[12px] transition ${isChecked ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary": "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"}`} aria-pressed={isChecked}
+                    >
                   {category.label}
                 </button>
               );
@@ -203,11 +200,7 @@ export default function ResourceFilters({
                   type="button"
                   key={tag.id}
                   onClick={() => toggleDraftFilter("tagIds", tag.id)}
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    isChecked
-                      ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary"
-                      : "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"
-                  }`}
+                  className={`rounded-full border px-2 py-1.5 text-[11px] transition ${ isChecked ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary": "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"}`}
                   aria-pressed={isChecked}
                 >
                   {tag.label}
@@ -230,11 +223,7 @@ export default function ResourceFilters({
                   type="button"
                   key={priceModel.id}
                   onClick={() => toggleDraftFilter("priceModelIds", priceModel.id)}
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    isChecked
-                      ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary"
-                      : "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"
-                  }`}
+                  className={`rounded-full border px-2 py-1.5 text-[11px] transition ${isChecked ? "border-buttonColor/80 bg-buttonColor/20 text-textPrimary": "border-border/80 text-textSecondary hover:border-buttonColor/50 hover:text-textPrimary"}`}
                   aria-pressed={isChecked}
                 >
                   {priceModel.label}

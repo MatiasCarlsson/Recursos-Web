@@ -53,11 +53,13 @@ function SearchBar({ categories, tags = [] }: SearchBarProps) {
   }
 
   function handleCategoryClick(category: SearchCategory) {
+    const nextCategoryId = selectedCategoryId === category.id ? null : category.id;
+
     selectCategory(category);
     router.push(
       buildResourceUrl({
         search: query,
-        categoryId: category.id,
+        categoryId: nextCategoryId,
         tagIds: selectedTagIds,
       }),
     );
