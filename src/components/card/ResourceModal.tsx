@@ -46,7 +46,10 @@ export default function ResourceModal({ resource, imageSrc, isOpen, onClose }: R
           className="rounded-lg mb-4 w-full aspect-video object-cover"
         />
 
-        <p className="text-gray-300 mb-4">{resource.content}</p>
+        <div className="bg-cardBackground/70 p-4 rounded-lg mb-4">
+
+        <p>{resource.content}</p>
+        </div>
 
         <div className="mb-4 flex justify-end">
           <a
