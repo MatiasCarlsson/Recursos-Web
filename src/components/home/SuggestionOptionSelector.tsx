@@ -66,11 +66,11 @@ export default function SuggestionOptionSelector({
             </span>
           ))
         ) : (
-          <span className="text-xs text-textSecondary">Sin selección</span>
+          <span className="text-xs my-2 text-textSecondary">Sin selección</span>
         )}
       </div>
 
-      <div className="h-36 space-y-1 overflow-y-auto rounded-lg border border-border/70 bg-primaryColor/90 px-2 py-2">
+      <div className="h-36 space-y-1 overflow-y-auto rounded-lg border border-border/70 bg-primaryColor/90 px-2">
         {filteredOptions.length > 0 ? (
           filteredOptions.map((option) => {
             const isSelected = isOptionSelected(option);
@@ -82,11 +82,7 @@ export default function SuggestionOptionSelector({
                 onClick={() => onOptionClick(option)}
                 onMouseEnter={() => setHoveredDescription(option.description ?? null)}
                 onMouseLeave={() => setHoveredDescription(null)}
-                className={`w-full rounded-md px-2 py-1 text-left text-sm transition-all ${
-                  isSelected
-                    ? "bg-buttonColor/22 text-textPrimary"
-                    : "text-textSecondary hover:bg-white/6 hover:text-textPrimary"
-                }`}
+                className={`w-full rounded-md px-2 py-1 text-left text-sm transition-all ${isSelected ? "bg-buttonColor/22 text-textPrimary" : "text-textSecondary hover:bg-white/6 hover:text-textPrimary"}`}
               >
                 {option.label}
               </button>

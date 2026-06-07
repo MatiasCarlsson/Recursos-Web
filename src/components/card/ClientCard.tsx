@@ -14,6 +14,52 @@ interface ClientCardProps {
   page?: number;
 }
 
+type ResourcesCacheEntry = {
+  resources: Resource[];
+  pagination: PaginatedResources["pagination"] | null;
+  cachedAt: number;
+};
+
+const CACHE_PREFIX = "resources:list-cache:v1";
+
+function buildCacheKey({ categoryIds, tagIds, priceModelIds, search, page }: ClientCardProps) {
+  const params = new URLSearchParams();
+
+  if (search?.trim()) params.set("search", search.trim());
+  if (categoryIds?.length) params.set("categoryIds", categoryIds.join(","));
+  if (tagIds?.length) params.set("tagIds", tagIds.join(","));
+  if (priceModelIds?.length) params.set("priceModelIds", priceModelIds.join(","));
+  if (page && page > 1) params.set("page", String(page));
+
+  return `${CACHE_PREFIX}:${params.toString() || "default"}`;
+}
+
+function readCachedResources(cacheKey: string): ResourcesCacheEntry | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = window.localStorage.getItem(cacheKey);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as ResourcesCacheEntry;
+    if (!parsed || !Array.isArray(parsed.resources)) return null;
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedResources(cacheKey: string, value: ResourcesCacheEntry) {
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.setItem(cacheKey, JSON.stringify(value));
+  } catch {
+    // Ignore quota or serialization failures.
+  }
+}
+
 function buildQuery({ categoryIds, tagIds, priceModelIds, search, page }: ClientCardProps) {
   const q = new URLSearchParams();
   if (search) q.set("search", search);
@@ -32,10 +78,12 @@ export default function ClientCard({
   search,
   page = 1,
 }: ClientCardProps) {
+  const cacheKey = buildCacheKey({ categoryIds, tagIds, priceModelIds, search, page });
   const [loading, setLoading] = useState(true);
   const [resources, setResources] = useState<Resource[]>([]);
   const [pagination, setPagination] = useState<PaginatedResources["pagination"] | null>(null);
   const preloadedImagesRef = useRef(new Set<string>());
+  const hasCachedDataRef = useRef(false);
   const hasActiveFilters =
     Boolean(search?.trim()) ||
     Boolean(categoryIds?.length) ||
@@ -47,14 +95,20 @@ export default function ClientCard({
 
   useEffect(() => {
     let mounted = true;
-    let idleId: number | null = null;
-    let timeoutId: number | null = null;
+    const cachedResources = readCachedResources(cacheKey);
+    hasCachedDataRef.current = Boolean(cachedResources?.resources.length);
+
+    const hydrateFromCache = () => {
+      if (!mounted || !cachedResources) return;
+
+      setResources(cachedResources.resources);
+      setPagination(cachedResources.pagination ?? null);
+      setLoading(false);
+    };
+
+    const hydrateTimerId = window.setTimeout(hydrateFromCache, 0);
 
     const runFetch = () => {
-      if (!mounted) return;
-
-      setLoading(true);
-
       const q = new URLSearchParams();
       q.set("limit", "15");
       q.set("page", String(page ?? 1));
@@ -68,19 +122,23 @@ export default function ClientCard({
         .then((payload) => {
           if (!mounted) return;
 
-          if (Array.isArray(payload)) {
-            setResources(payload);
-            setPagination(null);
-            return;
-          }
+          const nextResources = Array.isArray(payload) ? payload : payload.data || [];
+          const nextPagination = Array.isArray(payload) ? null : payload.pagination || null;
 
-          setResources(payload.data || []);
-          setPagination(payload.pagination || null);
+          setResources(nextResources);
+          setPagination(nextPagination);
+          writeCachedResources(cacheKey, {
+            resources: nextResources,
+            pagination: nextPagination,
+            cachedAt: Date.now(),
+          });
         })
         .catch(() => {
           if (!mounted) return;
-          setResources([]);
-          setPagination(null);
+          if (!hasCachedDataRef.current) {
+            setResources([]);
+            setPagination(null);
+          }
         })
         .finally(() => {
           if (!mounted) return;
@@ -88,46 +146,28 @@ export default function ClientCard({
         });
     };
 
-    const scheduleFetch = () => {
-      if (typeof window.requestIdleCallback === "function") {
-        idleId = window.requestIdleCallback(runFetch);
-        return;
-      }
-
-      timeoutId = window.setTimeout(runFetch, 200);
-    };
-
-    if (hasActiveFilters) {
-      timeoutId = window.setTimeout(runFetch, 0);
-    } else if (document.readyState === "complete") {
-      scheduleFetch();
-    } else {
-      const onLoad = () => scheduleFetch();
-      window.addEventListener("load", onLoad, { once: true });
-
-      return () => {
-        mounted = false;
-        window.removeEventListener("load", onLoad);
-        if (idleId !== null && typeof window.cancelIdleCallback === "function") {
-          window.cancelIdleCallback(idleId);
-        }
-        if (timeoutId !== null) {
-          window.clearTimeout(timeoutId);
-        }
-      };
-    }
+    const cancel =
+      typeof window.requestIdleCallback === "function"
+        ? (() => {
+            const idleId = window.requestIdleCallback(runFetch);
+            return () => {
+              if (typeof window.cancelIdleCallback === "function") {
+                window.cancelIdleCallback(idleId);
+              }
+            };
+          })()
+        : (() => {
+            const timeoutId = window.setTimeout(runFetch, 120);
+            return () => window.clearTimeout(timeoutId);
+          })();
 
     return () => {
       mounted = false;
-      if (idleId !== null && typeof window.cancelIdleCallback === "function") {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
-      }
+      window.clearTimeout(hydrateTimerId);
+      cancel();
     };
   }, [
-    hasActiveFilters,
+    cacheKey,
     categoryIds,
     categoryIdsKey,
     tagIds,

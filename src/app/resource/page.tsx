@@ -31,6 +31,30 @@ function toUnique(values: number[]): number[] {
   return [...new Set(values)];
 }
 
+function buildClientCardKey({
+  categoryIds,
+  tagIds,
+  priceModelIds,
+  search,
+  page,
+}: {
+  categoryIds: number[];
+  tagIds: number[];
+  priceModelIds: number[];
+  search?: string;
+  page: number;
+}) {
+  const params = new URLSearchParams();
+
+  if (search?.trim()) params.set("search", search.trim());
+  if (categoryIds.length) params.set("categoryIds", categoryIds.join(","));
+  if (tagIds.length) params.set("tagIds", tagIds.join(","));
+  if (priceModelIds.length) params.set("priceModelIds", priceModelIds.join(","));
+  if (page > 1) params.set("page", String(page));
+
+  return params.toString() || "default";
+}
+
 export default async function Resources({ searchParams }: ResourcesPageProps) {
   const params = searchParams ? await searchParams : undefined;
   const categoryIdsParam = params?.categoryIds;
@@ -64,6 +88,14 @@ export default async function Resources({ searchParams }: ResourcesPageProps) {
       ? [Number(priceModelIdParam)]
       : []),
   ]);
+  const currentPage = pageParam && Number.isInteger(Number(pageParam)) ? Number(pageParam) : 1;
+  const clientCardKey = buildClientCardKey({
+    categoryIds: selectedCategoryIds,
+    tagIds: selectedTagIds,
+    priceModelIds: selectedPriceModelIds,
+    search: searchParam,
+    page: currentPage,
+  });
 
   return (
     <main>
@@ -86,11 +118,12 @@ export default async function Resources({ searchParams }: ResourcesPageProps) {
         </div>
 
         <ClientCard
+          key={clientCardKey}
           categoryIds={selectedCategoryIds.length ? selectedCategoryIds : undefined}
           tagIds={selectedTagIds.length ? selectedTagIds : undefined}
           priceModelIds={selectedPriceModelIds.length ? selectedPriceModelIds : undefined}
           search={searchParam}
-          page={pageParam && Number.isInteger(Number(pageParam)) ? Number(pageParam) : 1}
+          page={currentPage}
         />
       </section>
     </main>
