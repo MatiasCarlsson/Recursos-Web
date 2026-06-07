@@ -24,7 +24,13 @@
 
   /* Shadows */
   --shadow-footerShadow: 0px -10px 19px 8px rgba(124, 58, 237, 0.43);
+  --animate-pop: pop 2.5s ease-in-out infinite;
+  @keyframes pop {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.5; } /* Le sumé un toque de opacidad para que parezca más un parpadeo (blink) */
+  }
 }
+
 
 /* --color-primary: #0b0216; */
 :root {

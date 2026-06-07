@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ScrollReveal from "../../components/ScrollReveal";
 import SupportSection from "@/components/about/SupportSection";
+import CopyEmailButton from "@/components/about/CopyEmailButton";
 import ContactForm from "@/components/about/ContactForm";
 
 export const dynamic = "force-static";
@@ -309,17 +310,17 @@ export default function AboutProjectPage() {
             <p className={`${sectionLabelClass} mb-4`}>contacto</p>
             <div className="grid gap-6 lg:grid-cols-[1.1fr_1.2fr]">
               <div>
-                <h2 className="mb-3 text-2xl font-semibold italic text-textPrimary sm:text-3xl">
+                <h2 className="mb-3 text-2xl font-semibold italic sm:text-3xl">
                   Hablemos de ideas, recursos o mejoras.
                 </h2>
                 <p className={`${bodyTextClass} mb-4`}>
                   Si queres aportar sugerencias, reportar algo o proponer colaboraciones, este es el
                   canal directo. Respondo personalmente.
                 </p>
-                <div className="rounded-2xl border border-border/30 bg-primaryColor/35 p-4">
-                  <p className="mt-2 text-xs text-textSecondary">
-                    Usa el formulario o copia el correo desde el footer.
-                  </p>
+                <div className="flex items-center gap-3 rounded-2xl border border-border/30 bg-primaryColor/35 p-4">
+                  <p>
+                    Copía el correo electrónico desde aquí
+                  </p> <CopyEmailButton />
                 </div>
               </div>
 
