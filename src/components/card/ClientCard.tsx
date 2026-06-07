@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ResourceCard from "./ResourceCard";
+import type { PaginatedResources } from "@/api/api";
+import type { Resource } from "@/types/resource";
 
 interface ClientCardProps {
   categoryIds?: number[];
@@ -30,107 +32,114 @@ export default function ClientCard({
   search,
   page = 1,
 }: ClientCardProps) {
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [resources, setResources] = useState<any[]>([]);
-  const [pagination, setPagination] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [pagination, setPagination] = useState<PaginatedResources["pagination"] | null>(null);
   const preloadedImagesRef = useRef(new Set<string>());
   const hasActiveFilters =
     Boolean(search?.trim()) ||
     Boolean(categoryIds?.length) ||
     Boolean(tagIds?.length) ||
     Boolean(priceModelIds?.length);
+  const categoryIdsKey = categoryIds?.join(",") ?? "";
+  const tagIdsKey = tagIds?.join(",") ?? "";
+  const priceModelIdsKey = priceModelIds?.join(",") ?? "";
 
   useEffect(() => {
-    if (hasActiveFilters) {
-      setShouldLoad(true);
-      return;
-    }
-
-    let idleId: number | null = null;
-
-    function onLoad() {
-      // Prefer requestIdleCallback to avoid blocking with heavy fetches
-      if (typeof (window as any).requestIdleCallback === "function") {
-        idleId = (window as any).requestIdleCallback(() => setShouldLoad(true));
-      } else {
-        // Fallback small delay
-        idleId = window.setTimeout(() => setShouldLoad(true), 200);
-      }
-    }
-
-    if (document.readyState === "complete") {
-      onLoad();
-    } else {
-      window.addEventListener("load", onLoad, { once: true });
-    }
-
-    return () => {
-      if (idleId !== null) {
-        if (typeof (window as any).cancelIdleCallback === "function") {
-          (window as any).cancelIdleCallback(idleId);
-        } else {
-          clearTimeout(idleId);
-        }
-      }
-      window.removeEventListener("load", onLoad);
-    };
-  }, [hasActiveFilters]);
-
-  useEffect(() => {
-    if (!shouldLoad) return;
-
     let mounted = true;
-    setLoading(true);
+    let idleId: number | null = null;
+    let timeoutId: number | null = null;
 
-    const q = new URLSearchParams();
-    q.set("limit", "15");
-    q.set("page", String(page ?? 1));
-    if (search) q.set("search", String(search));
-    if (categoryIds && categoryIds.length) q.set("categoryIds", categoryIds.join(","));
-    if (tagIds && tagIds.length) q.set("tagIds", tagIds.join(","));
-    if (priceModelIds && priceModelIds.length) q.set("priceModelIds", priceModelIds.join(","));
+    const runFetch = () => {
+      if (!mounted) return;
 
-    fetch(`/api/resources?${q.toString()}`)
-      .then((res) => res.json())
-      .then((payload) => {
-        if (!mounted) return;
-        // Accept both { data, pagination } and legacy arrays
-        if (Array.isArray(payload)) {
-          setResources(payload);
-          setPagination(null);
-        } else if (payload && payload.data) {
+      setLoading(true);
+
+      const q = new URLSearchParams();
+      q.set("limit", "15");
+      q.set("page", String(page ?? 1));
+      if (search) q.set("search", String(search));
+      if (categoryIds && categoryIds.length) q.set("categoryIds", categoryIds.join(","));
+      if (tagIds && tagIds.length) q.set("tagIds", tagIds.join(","));
+      if (priceModelIds && priceModelIds.length) q.set("priceModelIds", priceModelIds.join(","));
+
+      fetch(`/api/resources?${q.toString()}`)
+        .then((res) => res.json() as Promise<Resource[] | PaginatedResources>)
+        .then((payload) => {
+          if (!mounted) return;
+
+          if (Array.isArray(payload)) {
+            setResources(payload);
+            setPagination(null);
+            return;
+          }
+
           setResources(payload.data || []);
           setPagination(payload.pagination || null);
-        } else {
+        })
+        .catch(() => {
+          if (!mounted) return;
           setResources([]);
           setPagination(null);
+        })
+        .finally(() => {
+          if (!mounted) return;
+          setLoading(false);
+        });
+    };
+
+    const scheduleFetch = () => {
+      if (typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(runFetch);
+        return;
+      }
+
+      timeoutId = window.setTimeout(runFetch, 200);
+    };
+
+    if (hasActiveFilters) {
+      timeoutId = window.setTimeout(runFetch, 0);
+    } else if (document.readyState === "complete") {
+      scheduleFetch();
+    } else {
+      const onLoad = () => scheduleFetch();
+      window.addEventListener("load", onLoad, { once: true });
+
+      return () => {
+        mounted = false;
+        window.removeEventListener("load", onLoad);
+        if (idleId !== null && typeof window.cancelIdleCallback === "function") {
+          window.cancelIdleCallback(idleId);
         }
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setResources([]);
-        setPagination(null);
-      })
-      .finally(() => {
-        if (!mounted) return;
-        setLoading(false);
-      });
+        if (timeoutId !== null) {
+          window.clearTimeout(timeoutId);
+        }
+      };
+    }
 
     return () => {
       mounted = false;
+      if (idleId !== null && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
     };
   }, [
-    shouldLoad,
-    categoryIds?.join(","),
-    tagIds?.join(","),
-    priceModelIds?.join(","),
+    hasActiveFilters,
+    categoryIds,
+    categoryIdsKey,
+    tagIds,
+    tagIdsKey,
+    priceModelIds,
+    priceModelIdsKey,
     search,
     page,
   ]);
 
   useEffect(() => {
-    if (!shouldLoad || !resources.length) return;
+    if (!resources.length) return;
 
     const urlsToPreload = resources
       .map((resource) => resource?.image)
@@ -166,13 +175,13 @@ export default function ClientCard({
 
     const timeoutId = window.setTimeout(preload, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [resources, shouldLoad]);
+  }, [resources]);
 
-  if (!shouldLoad || loading) {
+  if (loading) {
     return (
       <section className="w-full">
         <article className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 15 }).map((_, index) => (
             <div
               key={index}
               className="h-72 rounded-2xl border border-slate-800 bg-slate-900/60 animate-pulse"
