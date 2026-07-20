@@ -19,7 +19,7 @@ export default function ResourceModal({ resource, imageSrc, isOpen, onClose }: R
       onClick={onClose}
     >
       <div
-        className="rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 bg-clip-padding backdrop-filter bg-opacity-10 border border-gray-700"
+        className="rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 border border-white/15 bg-cardBackground/95 backdrop-blur-md shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-start mb-4">
@@ -34,21 +34,22 @@ export default function ResourceModal({ resource, imageSrc, isOpen, onClose }: R
           </button>
         </div>
 
-        <Image
-          src={imageSrc ?? resource.image}
-          alt={resource.title}
-          width={1200}
-          height={675}
-          sizes="(max-width: 1024px) 100vw, 900px"
-          quality={90}
-          loading="eager"
-          priority
-          className="rounded-lg mb-4 w-full aspect-video object-cover"
-        />
+        <div className="flex flex-wrap gap-4 mb-4">
+          <Image
+            src={imageSrc ?? resource.image}
+            alt={resource.title}
+            width={640}
+            height={360}
+            sizes="(max-width: 768px) 100vw, 360px"
+            quality={90}
+            loading="eager"
+            priority
+            className="rounded-lg w-full sm:w-[440px] aspect-video object-cover"
+          />
 
-        <div className="bg-cardBackground/70 p-4 rounded-lg mb-4">
-
-        <p>{resource.content}</p>
+          <div className="bg-cardBackground/70 p-4 rounded-lg flex-1 min-w-[260px] self-start">
+            <p className="text-sm leading-relaxed">{resource.content}</p>
+          </div>
         </div>
 
         <div className="mb-4 flex justify-end">

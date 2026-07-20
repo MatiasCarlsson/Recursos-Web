@@ -33,7 +33,7 @@ export default async function Card({
     priceModelIds,
     search,
     page,
-    limit: 15,
+    limit: 18,
   });
   const resources = result.data;
   const pagination = result.pagination;
@@ -68,7 +68,7 @@ export default async function Card({
 
   return (
     <section className="w-full">
-      <article className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+      <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
         {resources.map((resource, index) => (
           <ResourceCard key={resource.id} resource={resource} prioritizeImage={index < 6} />
         ))}

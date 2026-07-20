@@ -17,7 +17,7 @@
   --color-cardBackground: #12002e;
   --color-border: #3d1a6e;
   --color-textPrimary: #c783ff;
-  --color-textSecondary: #9951ff;
+  --color-textSecondary: #ead3ff  ;
   --color-buttonColor: #bf00ff;
   --color-accent: #7c3aed;
   --color-glow: #d946ef;
@@ -40,7 +40,7 @@
   --color-card: #12002e;
   --color-border: #18002e;
   --color-text-primary: #c783ff;
-  --color-text-secondary: #9951ff;
+  --color-text-secondary: #ead3ff;
   /* --color-text-secondary: #8865b5; */
   --color-button: #bf00ff;
   --color-accent: #7c3aed;
@@ -75,6 +75,7 @@ h5,
 h6 {
   color: var(--color-text-primary);
   font-style: italic;
+    font-weight: bold;
 }
 
 p {

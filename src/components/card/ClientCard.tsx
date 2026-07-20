@@ -110,7 +110,7 @@ export default function ClientCard({
 
     const runFetch = () => {
       const q = new URLSearchParams();
-      q.set("limit", "15");
+      q.set("limit", "18");
       q.set("page", String(page ?? 1));
       if (search) q.set("search", String(search));
       if (categoryIds && categoryIds.length) q.set("categoryIds", categoryIds.join(","));
@@ -132,6 +132,10 @@ export default function ClientCard({
             pagination: nextPagination,
             cachedAt: Date.now(),
           });
+
+          // Precargar la siguiente página en segundo plano para que al
+          // avanzar ya esté en cache y la transición sea inmediata.
+          prefetchNextPage(nextPagination);
         })
         .catch(() => {
           if (!mounted) return;
@@ -144,6 +148,71 @@ export default function ClientCard({
           if (!mounted) return;
           setLoading(false);
         });
+    };
+
+    const prefetchNextPage = (currentPagination: PaginatedResources["pagination"] | null) => {
+      if (!currentPagination?.hasNextPage) return;
+
+      const nextPage = (currentPagination.currentPage || page || 1) + 1;
+      const nextCacheKey = buildCacheKey({
+        categoryIds,
+        tagIds,
+        priceModelIds,
+        search,
+        page: nextPage,
+      });
+
+      // Si ya la tenemos cacheada, solo precargamos sus imágenes.
+      const cached = readCachedResources(nextCacheKey);
+      if (cached?.resources.length) {
+        preloadImages(cached.resources);
+        return;
+      }
+
+      const q = new URLSearchParams();
+      q.set("limit", "18");
+      q.set("page", String(nextPage));
+      if (search) q.set("search", String(search));
+      if (categoryIds && categoryIds.length) q.set("categoryIds", categoryIds.join(","));
+      if (tagIds && tagIds.length) q.set("tagIds", tagIds.join(","));
+      if (priceModelIds && priceModelIds.length) q.set("priceModelIds", priceModelIds.join(","));
+
+      fetch(`/api/resources?${q.toString()}`)
+        .then((res) => res.json() as Promise<Resource[] | PaginatedResources>)
+        .then((payload) => {
+          const nextResources = Array.isArray(payload) ? payload : payload.data || [];
+          const nextPagination = Array.isArray(payload) ? null : payload.pagination || null;
+
+          writeCachedResources(nextCacheKey, {
+            resources: nextResources,
+            pagination: nextPagination,
+            cachedAt: Date.now(),
+          });
+          preloadImages(nextResources);
+        })
+        .catch(() => {
+          // Falla silenciosa: se reintentará al navegar.
+        });
+    };
+
+    const preloadImages = (items: Resource[]) => {
+      const urls = items
+        .map((resource) => resource?.image)
+        .filter((image): image is string => typeof image === "string" && image.trim().length > 0)
+        .slice(0, 12);
+
+      const queue = urls.filter((image) => {
+        if (preloadedImagesRef.current.has(image)) return false;
+        preloadedImagesRef.current.add(image);
+        return true;
+      });
+
+      queue.forEach((imageUrl) => {
+        const image = new window.Image();
+        image.decoding = "async";
+        image.loading = "eager";
+        image.src = imageUrl;
+      });
     };
 
     const cancel =
@@ -178,50 +247,11 @@ export default function ClientCard({
     page,
   ]);
 
-  useEffect(() => {
-    if (!resources.length) return;
-
-    const urlsToPreload = resources
-      .map((resource) => resource?.image)
-      .filter((image): image is string => typeof image === "string" && image.trim().length > 0)
-      .slice(0, 12);
-
-    if (!urlsToPreload.length) return;
-
-    const preloadQueue = urlsToPreload.filter((image) => {
-      if (preloadedImagesRef.current.has(image)) {
-        return false;
-      }
-
-      preloadedImagesRef.current.add(image);
-      return true;
-    });
-
-    if (!preloadQueue.length) return;
-
-    const preload = () => {
-      preloadQueue.forEach((imageUrl) => {
-        const image = new window.Image();
-        image.decoding = "async";
-        image.loading = "eager";
-        image.src = imageUrl;
-      });
-    };
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(preload);
-      return () => window.cancelIdleCallback(idleId);
-    }
-
-    const timeoutId = window.setTimeout(preload, 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [resources]);
-
   if (loading) {
     return (
       <section className="w-full">
-        <article className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 15 }).map((_, index) => (
+        <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 18 }).map((_, index) => (
             <div
               key={index}
               className="h-72 rounded-2xl border border-slate-800 bg-slate-900/60 animate-pulse"
@@ -257,7 +287,7 @@ export default function ClientCard({
 
   return (
     <section className="w-full">
-      <article className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+      <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
         {resources.map((resource, index) => (
           <ResourceCard
             key={resource.id ?? `resource-${index}`}
