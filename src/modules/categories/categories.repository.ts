@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Categoria, Prisma } from "@prisma/client";
+import type { Paginated } from "@/types/paginated";
 
 export type CategoryPaginationParams = {
   page: number;
@@ -10,17 +11,7 @@ export type CategoryPaginationParams = {
   sort?: "asc" | "desc";
 };
 
-export type PaginatedResult<T> = {
-  data: T[];
-  pagination: {
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-};
+export type PaginatedResult<T> = Paginated<T>;
 
 export class CategoryRepository {
   async findAllBasic() {

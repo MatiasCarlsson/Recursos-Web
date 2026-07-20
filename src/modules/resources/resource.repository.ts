@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import type { Paginated } from "@/types/paginated";
 
 function isMissingFeaturedFieldError(error: unknown) {
   return error instanceof Error && error.message.includes("Unknown argument `destacado`");
@@ -75,6 +76,7 @@ export class ResourceRepository {
       modeloPrecioIds,
       etiquetaId,
       etiquetaIds,
+      categoriaOrEtiquetaIds,
       sortBy = "creado",
       sort = "desc",
     } = params;
@@ -122,8 +124,42 @@ export class ResourceRepository {
     const normalizedCategoryIds = [categoriaId, ...(categoriaIds ?? [])].filter(
       (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
     );
-    if (normalizedCategoryIds.length) {
-      where.id_categoria = { in: [...new Set(normalizedCategoryIds)] };
+    const normalizedTagIds = [etiquetaId, ...(etiquetaIds ?? [])].filter(
+      (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
+    );
+
+    if (categoriaOrEtiquetaIds) {
+      // Filtro tipo OR: recursos que tengan cualquiera de las categorías O etiquetas.
+      const orClause: Prisma.RecursoWhereInput[] = [];
+      const catIds = [...new Set(categoriaOrEtiquetaIds.categoriaIds ?? [])].filter(
+        (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
+      );
+      const tagIds = [...new Set(categoriaOrEtiquetaIds.etiquetaIds ?? [])].filter(
+        (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
+      );
+
+      if (catIds.length) {
+        orClause.push({ id_categoria: { in: catIds } });
+      }
+      if (tagIds.length) {
+        orClause.push({ recurso_etiqueta: { some: { id_etiqueta: { in: tagIds } } } });
+      }
+
+      if (orClause.length) {
+        where.OR = orClause;
+      }
+    } else {
+      if (normalizedCategoryIds.length) {
+        where.id_categoria = { in: [...new Set(normalizedCategoryIds)] };
+      }
+
+      if (normalizedTagIds.length) {
+        where.recurso_etiqueta = {
+          some: {
+            id_etiqueta: { in: [...new Set(normalizedTagIds)] },
+          },
+        };
+      }
     }
 
     if (modeloPrecioId) {
@@ -135,25 +171,6 @@ export class ResourceRepository {
     );
     if (normalizedPriceModelIds.length) {
       where.id_modelo_precio = { in: [...new Set(normalizedPriceModelIds)] };
-    }
-
-    if (etiquetaId) {
-      where.recurso_etiqueta = {
-        some: {
-          id_etiqueta: etiquetaId,
-        },
-      };
-    }
-
-    const normalizedTagIds = [etiquetaId, ...(etiquetaIds ?? [])].filter(
-      (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
-    );
-    if (normalizedTagIds.length) {
-      where.recurso_etiqueta = {
-        some: {
-          id_etiqueta: { in: [...new Set(normalizedTagIds)] },
-        },
-      };
     }
 
     // Si el cliente Prisma aún no fue regenerado en caliente, toleramos que no exista el campo
@@ -305,18 +322,9 @@ export type PaginationParams = {
   modeloPrecioIds?: number[];
   etiquetaId?: number;
   etiquetaIds?: number[];
+  categoriaOrEtiquetaIds?: { categoriaIds?: number[]; etiquetaIds?: number[] };
   sortBy?: "nombre" | "creado" | "actualizacion";
   sort?: "asc" | "desc";
 };
 
-export type PaginatedResult<T> = {
-  data: T[];
-  pagination: {
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-};
+export type PaginatedResult<T> = Paginated<T>;

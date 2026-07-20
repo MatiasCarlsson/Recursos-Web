@@ -52,57 +52,37 @@ export interface PaginatedResources {
   };
 }
 
-const MAX_COMBINED_FILTER_RESULTS = 500;
-
-function paginateResourceList(resources: Resource[], page: number, limit: number): PaginatedResources {
-  const total = resources.length;
-  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const currentPage = totalPages === 0 ? 1 : Math.min(Math.max(page, 1), totalPages);
-  const start = (currentPage - 1) * limit;
-  const end = start + limit;
+async function resolvePreviewForResource(
+  item: Awaited<ReturnType<ResourceService["getAllResource"]>>[number],
+): Promise<Resource> {
+  const title = item.nombre ?? `Recurso #${item.id_recurso}`;
+  const preview = await resolveResourcePreviewImage({
+    resourceId: item.id_recurso,
+    rawUrl: item.url,
+    title,
+  });
 
   return {
-    data: resources.slice(start, end),
-    pagination: {
-      total,
-      totalPages,
-      currentPage,
-      limit,
-      hasNextPage: currentPage < totalPages,
-      hasPreviousPage: currentPage > 1,
-    },
+    id: item.id_recurso,
+    title,
+    url: preview.resourceUrl,
+    content: item.descripcion ?? "Sin descripción",
+    image: preview.imageUrl,
+    categoryId: item.id_categoria ?? null,
+    category: item.categoria?.nombre ?? "Sin categoría",
+    isFeatured: item.destacado,
+    createdAt: item.creado?.toISOString(),
+    tags:
+      item.recurso_etiqueta
+        ?.map((relation) => relation.etiqueta?.nombre)
+        .filter((name): name is string => Boolean(name)) ?? [],
   };
 }
 
 async function mapResourcesToViewModel(
   resources: Awaited<ReturnType<ResourceService["getAllResource"]>>,
 ): Promise<Resource[]> {
-  return await Promise.all(
-    resources.map(async (item) => {
-      const title = item.nombre ?? `Recurso #${item.id_recurso}`;
-      const preview = await resolveResourcePreviewImage({
-        resourceId: item.id_recurso,
-        rawUrl: item.url,
-        title,
-      });
-
-      return {
-        id: item.id_recurso,
-        title,
-        url: preview.resourceUrl,
-        content: item.descripcion ?? "Sin descripción",
-        image: preview.imageUrl,
-        categoryId: item.id_categoria ?? null,
-        category: item.categoria?.nombre ?? "Sin categoría",
-        isFeatured: item.destacado,
-        createdAt: item.creado?.toISOString(),
-        tags:
-          item.recurso_etiqueta
-            ?.map((relation) => relation.etiqueta?.nombre)
-            .filter((name): name is string => Boolean(name)) ?? [],
-      };
-    }),
-  );
+  return await Promise.all(resources.map((item) => resolvePreviewForResource(item)));
 }
 
 async function fetchResources(filters?: LoadResourcesFilters): Promise<Resource[]> {
@@ -145,62 +125,22 @@ export async function loadResourcesPaginated(
   const hasPriceModel = Boolean(filters?.priceModelIds?.length);
   const hasCategoryAndTag = hasCategory && hasTag;
 
-  if (hasCategoryAndTag) {
-    const [strictResult, byCategoryResult, byTagResult] = await Promise.all([
-      service.getResourcesPaginated({
-        page: 1,
-        limit: MAX_COMBINED_FILTER_RESULTS,
-        search: normalizedSearch,
-        categoriaIds: filters?.categoryIds,
-        etiquetaIds: filters?.tagIds,
-        modeloPrecioIds: filters?.priceModelIds,
-        sortBy: "creado",
-        sort: "desc",
-      }),
-      service.getResourcesPaginated({
-        page: 1,
-        limit: MAX_COMBINED_FILTER_RESULTS,
-        search: normalizedSearch,
-        categoriaIds: filters?.categoryIds,
-        modeloPrecioIds: filters?.priceModelIds,
-        sortBy: "creado",
-        sort: "desc",
-      }),
-      service.getResourcesPaginated({
-        page: 1,
-        limit: MAX_COMBINED_FILTER_RESULTS,
-        search: normalizedSearch,
-        etiquetaIds: filters?.tagIds,
-        modeloPrecioIds: filters?.priceModelIds,
-        sortBy: "creado",
-        sort: "desc",
-      }),
-    ]);
-
-    const strictResources = await mapResourcesToViewModel(strictResult.data);
-    const categoryResources = await mapResourcesToViewModel(byCategoryResult.data);
-    const tagResources = await mapResourcesToViewModel(byTagResult.data);
-
-    const strictIds = new Set(strictResources.map((resource) => resource.id));
-    const merged: Resource[] = [...strictResources];
-
-    for (const resource of [...categoryResources, ...tagResources]) {
-      if (!strictIds.has(resource.id)) {
-        strictIds.add(resource.id);
-        merged.push(resource);
-      }
-    }
-
-    return paginateResourceList(merged, page, limit);
-  }
-
   if (hasSearch || hasCategory || hasTag || hasPriceModel) {
     const result = await service.getResourcesPaginated({
       page,
       limit,
       search: normalizedSearch,
-      categoriaIds: filters?.categoryIds,
-      etiquetaIds: filters?.tagIds,
+      ...(hasCategoryAndTag
+        ? {
+            categoriaOrEtiquetaIds: {
+              categoriaIds: filters?.categoryIds,
+              etiquetaIds: filters?.tagIds,
+            },
+          }
+        : {
+            categoriaIds: filters?.categoryIds,
+            etiquetaIds: filters?.tagIds,
+          }),
       modeloPrecioIds: filters?.priceModelIds,
       sortBy: "creado",
       sort: "desc",

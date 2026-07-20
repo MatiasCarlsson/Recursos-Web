@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Prisma, Sugerencia } from "@prisma/client";
+import type { Paginated } from "@/types/paginated";
 
 export type SuggestionPaginationParams = {
   page: number;
@@ -11,17 +12,7 @@ export type SuggestionPaginationParams = {
   sort?: "asc" | "desc";
 };
 
-export type PaginatedResult<T> = {
-  data: T[];
-  pagination: {
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-};
+export type PaginatedResult<T> = Paginated<T>;
 
 export class SuggestionRepository {
   async findPendingStatusId(): Promise<number | null> {

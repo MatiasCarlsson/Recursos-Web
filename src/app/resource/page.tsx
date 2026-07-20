@@ -99,7 +99,7 @@ export default async function Resources({ searchParams }: ResourcesPageProps) {
 
   return (
     <main>
-      <h1 className="text-3xl text-center font-bold w-full">Recursos</h1>
+      <h1 className="text-3xl mt-10 text-center font-bold w-full">Recursos</h1>
       <section className="flex justify-center mt-6">
         <SearchBar categories={filters.categories} tags={filters.tags} />
       </section>
