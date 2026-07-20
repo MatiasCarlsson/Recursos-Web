@@ -14,6 +14,27 @@ function hashKey(raw: string) {
   return createHash("sha256").update(raw).digest("hex");
 }
 
+// Limpia periódicamente las entradas expiradas para evitar un memory leak,
+// ya que las keys se hashean y rara vez se reutilizan.
+function sweepExpiredEntries() {
+  const now = Date.now();
+  for (const [key, entry] of memoryStore.entries()) {
+    if (entry.expiresAt <= now) {
+      memoryStore.delete(key);
+    }
+  }
+}
+
+// Ejecuta el barrido como máximo una vez por minuto.
+let lastSweep = 0;
+function maybeSweep() {
+  const now = Date.now();
+  if (now - lastSweep > 60 * 1000) {
+    lastSweep = now;
+    sweepExpiredEntries();
+  }
+}
+
 function consumeSlot(key: string) {
   const now = Date.now();
   const current = memoryStore.get(key);
@@ -41,6 +62,8 @@ function consumeSlot(key: string) {
 }
 
 export function enforceSuggestionRateLimit(params: { ip?: string | null; email?: string | null }) {
+  maybeSweep();
+
   if (params.ip) {
     consumeSlot(`ip:${hashKey(params.ip.trim())}`);
   }
