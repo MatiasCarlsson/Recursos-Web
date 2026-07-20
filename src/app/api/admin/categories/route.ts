@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { CategoryService } from "@/modules/categories/categories.service";
+import { createCategorySchema } from "@/modules/categories/schemas/categories.create.schema";
 import { categoriesQuerySchema } from "@/modules/categories/schemas/categories.query.schema";
 import { toErrorResponse } from "@/lib/api-error-response";
+import { requireAdmin } from "@/lib/require-admin";
+
+export const runtime = "nodejs";
 
 const service = new CategoryService();
 
@@ -12,6 +16,20 @@ export async function GET(request: Request) {
 
     const categories = await service.getCategoriesPaginated(query);
     return NextResponse.json(categories);
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await requireAdmin();
+
+    const body = await request.json();
+    const data = createCategorySchema.parse(body);
+    const category = await service.createCategory(data);
+
+    return NextResponse.json(category, { status: 201 });
   } catch (error) {
     return toErrorResponse(error);
   }

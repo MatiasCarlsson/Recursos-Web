@@ -1,13 +1,13 @@
 import type { ApiError, PaginatedResponse } from "./types";
 
 export const API_ENDPOINTS = {
-  categories: "/api/categories",
-  tags: "/api/tags",
-  priceModels: "/api/price-models",
+  categories: "/api/admin/categories",
+  tags: "/api/admin/tags",
+  priceModels: "/api/admin/price-models",
   suggestionStatuses: "/api/suggestion-statuses",
   resources: "/api/resources",
   adminResources: "/api/admin/resources",
-  suggestions: "/api/suggestions",
+  suggestions: "/api/admin/suggestions",
 } as const;
 
 export const DEFAULT_QUERY = {
