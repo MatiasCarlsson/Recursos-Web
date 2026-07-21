@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
-import sharp from "sharp";
 
 type CacheEntry = {
   imageUrl: string;
@@ -143,6 +142,7 @@ async function uploadPreviewToSupabase(path: string, screenshotUrl: string) {
   }
 
   const rawBuffer = Buffer.from(await imageResponse.arrayBuffer());
+  const { default: sharp } = await import("sharp");
   const webpBuffer = await sharp(rawBuffer)
     .webp({ quality: 80, effort: 4 })
     .toBuffer();
