@@ -44,3 +44,8 @@ next-env.d.ts
 .agents
 .claude
 plan.md
+.agents
+.claude
+.codex
+.github/skills
+.github/hooks
