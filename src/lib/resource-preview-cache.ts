@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 
 type CacheEntry = {
   imageUrl: string;
@@ -17,6 +18,8 @@ const memoryCache = new Map<string, CacheEntry>();
 const STORAGE_FOLDER = "resources";
 const LOCAL_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 2; // 2 días 172,800,000 ms
 const MONTH_MS = 1000 * 60 * 60 * 24 * 30;
+const CAPTURE_TIMEOUT_MS = 1000 * 60; // 60s: tiempo máx. que espera a que cargue la web
+const CAPTURE_WAIT_UNTIL = "networkidle2"; // espera a que la red se estabilice
 
 function normalizeResourceUrl(rawUrl: string | null) {
   if (!rawUrl) return null;
@@ -40,17 +43,19 @@ function buildMicrolinkApiUrl(url: string) {
     url,
     screenshot: "true",
     meta: "false",
-    "screenshot.type": "png",
+    "screenshot.type": "webp",
     "screenshot.width": "1200",
     "screenshot.height": "675",
     "screenshot.fullPage": "false",
+    "screenshot.timeout": String(CAPTURE_TIMEOUT_MS),
+    waitUntil: CAPTURE_WAIT_UNTIL,
   });
 
   return `https://api.microlink.io/?${params.toString()}`;
 }
 
 function buildThumIoScreenshotUrl(url: string) {
-  return `https://image.thum.io/get/width/1200/crop/675/noanimate/${encodeURI(url)}`;
+  return `https://image.thum.io/get/width/1200/crop/675/noanimate/timeout/60/${encodeURI(url)}`;
 }
 
 function getBucketName() {
@@ -76,7 +81,7 @@ function getSupabaseClient() {
 
 function buildStoragePath(resourceId: number, normalizedUrl: string) {
   const hash = createHash("sha1").update(normalizedUrl).digest("hex").slice(0, 12);
-  return `${STORAGE_FOLDER}/${resourceId}-${hash}.png`;
+  return `${STORAGE_FOLDER}/${resourceId}-${hash}.webp`;
 }
 
 function buildMemoryKey(resourceId: number, normalizedUrl: string) {
@@ -89,11 +94,19 @@ async function getMicrolinkScreenshotUrl(normalizedUrl: string) {
     headers["x-api-key"] = process.env.MICROLINK_API_KEY;
   }
 
-  const response = await fetch(buildMicrolinkApiUrl(normalizedUrl), {
-    method: "GET",
-    headers,
-    cache: "no-store",
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CAPTURE_TIMEOUT_MS + 5000);
+  let response: Response;
+  try {
+    response = await fetch(buildMicrolinkApiUrl(normalizedUrl), {
+      method: "GET",
+      headers,
+      cache: "no-store",
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     throw new Error(`Microlink error ${response.status}`);
@@ -129,14 +142,16 @@ async function uploadPreviewToSupabase(path: string, screenshotUrl: string) {
     throw new Error(`Screenshot download error ${imageResponse.status}`);
   }
 
-  const contentType = imageResponse.headers.get("content-type") || "image/png";
-  const fileBuffer = await imageResponse.arrayBuffer();
+  const rawBuffer = Buffer.from(await imageResponse.arrayBuffer());
+  const webpBuffer = await sharp(rawBuffer)
+    .webp({ quality: 80, effort: 4 })
+    .toBuffer();
 
   const supabase = getSupabaseClient();
   const bucket = getBucketName();
 
-  const uploadResult = await supabase.storage.from(bucket).upload(path, fileBuffer, {
-    contentType,
+  const uploadResult = await supabase.storage.from(bucket).upload(path, webpBuffer, {
+    contentType: "image/webp",
     upsert: true,
     cacheControl: "2592000", // 30 dias
   });

@@ -2,14 +2,25 @@ import "dotenv/config";
 import { ResourceService } from "../src/modules/resources/resource.service";
 import { resolveResourcePreviewImage } from "../src/lib/resource-preview-cache";
 
+const SKIP_RESOURCE_IDS = new Set<number>([
+  9, 13, 19, 20, 27, 29,
+]);
+
 async function main() {
   const service = new ResourceService();
   const resources = await service.getAllResource();
 
   let ok = 0;
   let fail = 0;
+  let skipped = 0;
 
   for (const resource of resources) {
+    if (SKIP_RESOURCE_IDS.has(resource.id_recurso)) {
+      skipped += 1;
+      console.log(`SKIP recurso ${resource.id_recurso} (${resource.nombre})`);
+      continue;
+    }
+
     const title = resource.nombre ?? `Recurso #${resource.id_recurso}`;
 
     try {
@@ -28,7 +39,7 @@ async function main() {
     }
   }
 
-  console.log(`Previews actualizados: ${ok} | fallidos: ${fail}`);
+  console.log(`Previews actualizados: ${ok} | fallidos: ${fail} | saltados: ${skipped}`);
 }
 
 main().catch((error) => {

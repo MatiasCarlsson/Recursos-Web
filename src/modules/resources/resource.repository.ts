@@ -59,9 +59,14 @@ export class ResourceRepository {
   }
 
   async delete(id: number) {
-    return await prisma.recurso.delete({
-      where: { id_recurso: id },
-    });
+    return await prisma.$transaction([
+      prisma.recursoEtiqueta.deleteMany({
+        where: { id_recurso: id },
+      }),
+      prisma.recurso.delete({
+        where: { id_recurso: id },
+      }),
+    ]);
   }
 
   async findPaginated(params: PaginationParams): Promise<PaginatedResult<ResourceWithRelations>> {

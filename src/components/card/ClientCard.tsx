@@ -34,6 +34,8 @@ function buildCacheKey({ categoryIds, tagIds, priceModelIds, search, page }: Cli
   return `${CACHE_PREFIX}:${params.toString() || "default"}`;
 }
 
+const RESOURCES_CACHE_TTL_MS = 1000 * 60 * 5;
+
 function readCachedResources(cacheKey: string): ResourcesCacheEntry | null {
   if (typeof window === "undefined") return null;
 
@@ -43,6 +45,10 @@ function readCachedResources(cacheKey: string): ResourcesCacheEntry | null {
 
     const parsed = JSON.parse(raw) as ResourcesCacheEntry;
     if (!parsed || !Array.isArray(parsed.resources)) return null;
+
+    if (typeof parsed.cachedAt === "number" && Date.now() - parsed.cachedAt > RESOURCES_CACHE_TTL_MS) {
+      return null;
+    }
 
     return parsed;
   } catch {
