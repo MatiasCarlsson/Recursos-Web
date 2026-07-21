@@ -24,8 +24,6 @@ const transferAccounts: TransferAccount[] = [
   },
 ];
 
-const astroPayUrl =
-  process.env.NEXT_PUBLIC_SUPPORT_ASTROPAY_URL ?? "ASTROPAY_PENDIENTE_DE_CONFIGURAR";
 const koFiUrl = "https://ko-fi.com/matiascarlsson";
 
 function CopyButton({ value }: { value: string }) {
@@ -74,48 +72,6 @@ function TransferAccountRow({ account }: { account: TransferAccount }) {
   );
 }
 
-function AstroPayCard() {
-  const hasLink = !astroPayUrl.includes("PENDIENTE_DE_CONFIGURAR");
-
-  return (
-    <article className="rounded-2xl border border-border/40 bg-cardBackground/70 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-2xl font-black uppercase tracking-[0.22em] text-accent/90">ARS</p>
-          <h3 className="mt-1 text-sm font-semibold text-textPrimary">Astro Pay</h3>
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-[120px_1fr] sm:items-center">
-        <div className="flex aspect-square items-center justify-center rounded-2xl border border-border/40 bg-primaryColor/40">
-          <div className="text-center">
-            <div className="mx-auto mb-2 flex size-32 items-center justify-center rounded-xl border border-buttonColor/35 bg-buttonColor/10 text-[11px] font-bold tracking-[0.2em] text-buttonColor">
-              <Image src="/image/QR_AstroPay.png" alt="Astro Pay Logo" width={110} height={110} />
-            </div>
-            <p className="max-w-32 text-[11px] leading-relaxed text-textSecondary">
-              Escanea el QR e ingresa un monto.
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-sm leading-relaxed text-textSecondary">
-            Disponible para transferencias rapidas en ARS.
-          </p>
-          <a
-            href={hasLink ? astroPayUrl : "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex rounded-lg border border-buttonColor/60 bg-buttonColor/15 px-3 py-2 text-xs font-semibold text-textPrimary transition hover:border-buttonColor hover:bg-buttonColor/25 ${hasLink ? "" : "pointer-events-none opacity-60"}`}
-          >
-            {hasLink ? "Abrir Astro Pay" : "Configurar Astro Pay"}
-          </a>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function SupportSection() {
   const configuredTransfers = useMemo(
     () => transferAccounts.some((account) => !account.value.includes("PENDIENTE_DE_CONFIGURAR")),
@@ -156,7 +112,6 @@ export default function SupportSection() {
               {transferAccounts.map((account) => (
                 <TransferAccountRow key={account.currency} account={account} />
               ))}
-              <AstroPayCard />
             </div>
           </article>
 
