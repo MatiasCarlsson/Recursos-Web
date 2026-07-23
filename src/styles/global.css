@@ -10,6 +10,10 @@
 } */
 
 @theme {
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
+  --breakpoint-5xl: 3840px;
+
   --color-primaryColor: #0b0216;
   --color-headerBackground: #0d0020;
   --color-footerBackground: #18002e;

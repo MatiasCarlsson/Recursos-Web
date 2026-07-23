@@ -6,8 +6,8 @@ import MenuToggle from "./MenuToggle";
 function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 items-center text-center backdrop-blur-md border-b border-border/30">
-      <nav className="flex items-center w-full relative justify-between max-w-7xl mx-auto py-2">
-        <div className="w-32 md:w-40 flex shrink-0">
+      <nav className="flex items-center w-full relative justify-between max-w-7xl mx-auto 3xl:max-w-450 py-2">
+        <div className="ml-4 w-32 md:w-40 3xl:w-48 4xl:w-56 flex shrink-0">
           <Link href="/">
             <Image
               src="/svg/MC.svg"

@@ -104,7 +104,7 @@ export default async function Resources({ searchParams }: ResourcesPageProps) {
         <SearchBar categories={filters.categories} tags={filters.tags} />
       </section>
 
-      <section className="mt-8 grid gap-6 px-4 lg:grid-cols-[280px_1fr] lg:px-6">
+      <section className="mt-8 grid gap-6 px-4 lg:grid-cols-[280px_1fr] lg:px-6 3xl:grid-cols-[320px_1fr] 3xl:px-8 4xl:grid-cols-[380px_1fr] 4xl:px-10">
         <div className="lg:sticky lg:top-4 lg:h-fit">
           <ResourceFilters
             categories={filters.categories}

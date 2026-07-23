@@ -30,7 +30,7 @@ function SocialMedia(props: SocialMediaProps) {
       href={props.href}
       target={target}
       rel={rel}
-      className={props.className}
+      className={`${props.className} relative`}
       onClick={props.onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -44,7 +44,9 @@ function SocialMedia(props: SocialMediaProps) {
           className="transition-all duration-500 group-hover:brightness-0 group-hover:invert w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8"
         />
       </div>
-      <span className={`${props.styleMediaName ?? "hidden sm:inline-block ml-2"}`}>
+      <span
+        className={`${props.styleMediaName ?? "hidden sm:inline-block absolute left-full top-1/2 -translate-y-1/2 ml-2 transition-all duration-300 whitespace-nowrap"}`}
+      >
         {typedText}
       </span>
     </Link>

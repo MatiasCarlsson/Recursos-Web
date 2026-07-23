@@ -11,7 +11,7 @@ export default function FeaturedResourcesSection({ resources }: FeaturedResource
   }
 
   return (
-    <section id="destacados" className="mx-auto mt-14 w-full max-w-6xl px-4 sm:px-6">
+    <section id="destacados" className="mx-auto mt-14 w-full max-w-6xl 3xl:max-w-7xl 4xl:max-w-[1400px] px-4 sm:px-6">
       <header className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-textSecondary">
           Curados por el equipo
@@ -23,7 +23,7 @@ export default function FeaturedResourcesSection({ resources }: FeaturedResource
       </header>
 
       <ul
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 4xl:grid-cols-4"
         aria-label="Lista de recursos destacados"
       >
         {resources.map((resource) => (

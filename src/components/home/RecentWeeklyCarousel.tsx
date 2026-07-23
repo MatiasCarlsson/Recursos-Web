@@ -31,7 +31,7 @@ export default function RecentWeeklyCarousel({ resources }: RecentWeeklyCarousel
 
   return (
     <section
-      className="mx-auto mt-14 w-full max-w-6xl px-4 sm:px-6"
+      className="mx-auto mt-14 w-full max-w-6xl 3xl:max-w-7xl 4xl:max-w-[1400px] px-4 sm:px-6"
       aria-labelledby="recientes-semana-title"
     >
       <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
@@ -56,10 +56,10 @@ export default function RecentWeeklyCarousel({ resources }: RecentWeeklyCarousel
       >
         <ul className="flex snap-x snap-mandatory gap-4">
           {resources.map((resource) => (
-            <li
-              key={resource.id}
-              className="min-w-56 max-w-56 snap-start sm:min-w-60 sm:max-w-60 md:min-w-[16rem] md:max-w-[16rem]"
-            >
+              <li
+                key={resource.id}
+                className="min-w-56 max-w-56 snap-start sm:min-w-60 sm:max-w-60 md:min-w-[16rem] md:max-w-[16rem] 3xl:min-w-[20rem] 3xl:max-w-[20rem] 4xl:min-w-[24rem] 4xl:max-w-[24rem]"
+              >
               <ResourceCard resource={resource} variant="compact" />
             </li>
           ))}

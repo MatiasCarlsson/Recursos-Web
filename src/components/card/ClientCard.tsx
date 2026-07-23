@@ -256,7 +256,7 @@ export default function ClientCard({
   if (loading) {
     return (
       <section className="w-full">
-        <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 4xl:grid-cols-4 gap-4">
           {Array.from({ length: 18 }).map((_, index) => (
             <div
               key={index}
@@ -293,12 +293,12 @@ export default function ClientCard({
 
   return (
     <section className="w-full">
-      <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+      <article className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 4xl:grid-cols-4 gap-4 ">
         {resources.map((resource, index) => (
           <ResourceCard
             key={resource.id ?? `resource-${index}`}
             resource={resource}
-            prioritizeImage={index < 6}
+            prioritizeImage={index < 8}
           />
         ))}
       </article>

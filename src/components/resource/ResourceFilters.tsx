@@ -127,7 +127,7 @@ export default function ResourceFilters({
 
   const hasChanges = !areSameFilters(draftFilters, activeFilters);
   return (
-    <aside className="rounded-2xl border border-border/70 bg-cardBackground/70 p-4">
+    <aside className="rounded-2xl border border-border/70 bg-cardBackground/70 p-4 3xl:p-6 4xl:p-8">
       <div className="mb-3 flex items-center justify-between ">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-textSecondary">

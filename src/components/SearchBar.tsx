@@ -96,7 +96,7 @@ function SearchBar({ categories, tags = [] }: SearchBarProps) {
 
   return (
     <div
-      className="relative w-full max-w-4xl"
+      className="relative w-full max-w-4xl 3xl:max-w-5xl 4xl:max-w-6xl"
       onFocusCapture={openPanel}
       onBlurCapture={(event) => {
         // Cerramos solo cuando el foco sale completamente del contenedor.

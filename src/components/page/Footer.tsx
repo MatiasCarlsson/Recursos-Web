@@ -9,13 +9,13 @@ const textResponsive = "text-xs sm:text-sm md:text-base lg:text-lg";
 const styles = {
   // center content on small screens, left-align on md+; 3 columns on md+
   responsiveDisplay:
-    "grid sm:grid-cols-1 md:grid-cols-3 justify-items-center md:justify-items-start md:justify-between gap-6",
+    "grid sm:grid-cols-1 md:grid-cols-3 justify-items-center md:justify-items-center md:justify-center gap-6",
 
   styleSocialMedia:
     "group flex items-center bg-cardBackground rounded-full w-fit p-1.5 sm:p-0.5 md:p-1.5 lg:p-2 transition-all duration-300 hover:bg-backgroundCard hover:text-white",
 
   // media name hidden on xs, shown from sm; spacing handled by wrapper
-  styleMediaName: "hidden sm:inline-block ml-2 transition-opacity duration-300",
+  styleMediaName: "hidden sm:inline-block absolute left-full top-1/2 -translate-y-1/2 ml-2 transition-all duration-300 whitespace-nowrap",
 
   link: "hover:text-textPrimary hover:underline transition-all duration-400 hover:underline-offset-4 active:scale-95",
 };
@@ -62,9 +62,9 @@ export default function Footer() {
 
   return (
     <footer
-      className={`${styles.responsiveDisplay} ${textResponsive} font-semibold bg-footerBackground shadow-footerShadow italic py-4 text-textSecondary mt-10 px-4 text-center md:text-left`}
+       className={`${styles.responsiveDisplay} ${textResponsive} font-semibold bg-footerBackground shadow-footerShadow italic py-4 text-textSecondary mt-10 px-4 md:px-0 text-center md:text-left`}
     >
-      <section className="flex flex-col gap-2 items-center md:items-start w-full">
+      <section className="flex flex-col gap-2 items-center md:items-center w-full">
         <p>Contacto</p>
 
           <div className="flex gap-4 md:flex-col md:gap-3 items-center md:items-start">
