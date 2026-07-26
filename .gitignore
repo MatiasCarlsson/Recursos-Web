@@ -47,5 +47,4 @@ plan.md
 .agents
 .claude
 .codex
-.github/skills
-.github/hooks
+.github/
